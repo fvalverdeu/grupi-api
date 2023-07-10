@@ -5,13 +5,17 @@ import bcrypt from 'bcrypt';
 export interface IUser extends Document {
     email: string;
     password: string;
+    code: string;
+    status: string;
 
     comparePassword: (password: string) => Promise<boolean>;
 }
 
 const userSchema = new Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    code: { type: String, required: true, default: '' },
+    status: { type: String, required: true, default: 'UNVERIFIED' },
 });
 
 userSchema.pre<IUser>('save', async function (next) {
