@@ -9,7 +9,7 @@ const userSchema = new Schema({
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
     status: { type: String, required: true, default: EUserStatus.UNVERIFIED },
-    profile: { type: Object as () => IUserProfile, required: true }
+    profile: { type: Object as () => IUserProfile, required: false }
 });
 
 userSchema.pre<IUser>('save', async function (next) {
