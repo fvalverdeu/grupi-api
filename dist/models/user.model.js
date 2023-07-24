@@ -14,11 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const user_enum_1 = require("../constants/user.enum");
 const userSchema = new mongoose_1.Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
-    status: { type: String, required: true, default: 'UNVERIFIED' },
+    status: { type: String, required: true, default: user_enum_1.EUserStatus.UNVERIFIED },
+    profile: { type: Object, required: true }
 });
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {

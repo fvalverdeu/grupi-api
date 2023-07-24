@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
-import User, { IUser } from "../models/user.model";
+import User from "../models/user.model";
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import { sendMail } from "../config/mail.config";
+import { IUser } from "../interfaces/user.interface";
+import { EUserStatus } from "../constants/user.enum";
 
 function createToken(user: IUser) {
-    return jwt.sign({ id: user.id, email: user.email }, config.jwtSecret, {
+    return jwt.sign({ id: user.id, email: user.email, status: user.status }, config.jwtSecret, {
         expiresIn: 86400
     });
 }
@@ -58,7 +60,42 @@ export const confirmEmail = async (req: Request, res: Response): Promise<Respons
 
     const isMatch = user.code.toString() === req.body.code;
     if (isMatch) {
+        await User.findOneAndUpdate({ _id: user.id }, { status: EUserStatus.VERIFIED }, { new: true });
         return res.status(200).json({ confirm: true });
     }
     return res.status(400).json({ msg: 'The code is incorrect' });
+}
+
+export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
+    if (!req.body.profile) {
+        return res.status(400).json({ msg: 'No se enviaron datos del perfil.' });
+    }
+
+    const user = await User.findOne({ id: req.body.id });
+    if (!user) {
+        return res.status(400).json({ msg: 'El usuario no existe' });
+    }
+    try {
+        await User.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile }, { new: true });
+        return res.status(200).json({ confirm: true });
+    } catch (error) {
+        return res.status(400).json({ msg: 'The code is incorrect' });
+    }
+}
+
+export const userProfile = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const user = await User.findOne({ _id: req.params.id });
+        return res.status(200).json(user);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+}
+
+export default {
+    signUp,
+    signIn,
+    confirmEmail,
+    updateProfile,
+    userProfile,
 }

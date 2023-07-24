@@ -1,21 +1,15 @@
-import { model, Schema, Document } from "mongoose";
+import { model, Schema } from "mongoose";
 
 import bcrypt from 'bcrypt';
-
-export interface IUser extends Document {
-    email: string;
-    password: string;
-    code: string;
-    status: string;
-
-    comparePassword: (password: string) => Promise<boolean>;
-}
+import { IUser, IUserProfile } from "../interfaces/user.interface";
+import { EUserStatus } from "../constants/user.enum";
 
 const userSchema = new Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
-    status: { type: String, required: true, default: 'UNVERIFIED' },
+    status: { type: String, required: true, default: EUserStatus.UNVERIFIED },
+    profile: { type: Object as () => IUserProfile, required: true }
 });
 
 userSchema.pre<IUser>('save', async function (next) {
