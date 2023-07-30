@@ -8,5 +8,6 @@ const authValidate = passport.authenticate('jwt', { session: false });
 
 router.post('/user', authValidate, Controller.updateProfile);
 router.get('/user/profile/:id', authValidate, Controller.userProfile);
+router.get('/', Controller.getUsers);
 
 export default router;

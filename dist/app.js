@@ -8,6 +8,8 @@ const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
+const place_routes_1 = __importDefault(require("./routes/place.routes"));
+const visit_routes_1 = __importDefault(require("./routes/visit.routes"));
 const passport_1 = __importDefault(require("passport"));
 const passport_2 = __importDefault(require("./middlewares/passport"));
 // initializations
@@ -25,6 +27,9 @@ passport_1.default.use(passport_2.default);
 app.get('/', (req, res) => {
     res.send(`THE API is at http://localhost:${app.get('port')}`);
 });
-app.use(auth_routes_1.default);
-app.use(user_routes_1.default);
+app.use('/assets', express_1.default.static('src/assets'));
+app.use('/api/auth', auth_routes_1.default);
+app.use('/api/users', user_routes_1.default);
+app.use('/api/places', place_routes_1.default);
+app.use('/api/visits', visit_routes_1.default);
 exports.default = app;

@@ -12,11 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userProfile = exports.updateProfile = exports.confirmEmail = exports.signIn = exports.signUp = void 0;
+exports.getUsers = exports.userProfile = exports.updateProfile = exports.confirmEmail = exports.signIn = exports.signUp = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
-const mail_config_1 = require("../config/mail.config");
 const user_enum_1 = require("../constants/user.enum");
 function createToken(user) {
     return jsonwebtoken_1.default.sign({ id: user.id, email: user.email, status: user.status }, config_1.default.jwtSecret, {
@@ -37,7 +36,7 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newUser = new user_model_1.default(req.body);
     newUser.code = rNum.toString();
     yield newUser.save();
-    yield (0, mail_config_1.sendMail)(newUser.email, newUser.code.toString());
+    // await sendMail(newUser.email, newUser.code.toString());
     return res.status(201).json(newUser);
 });
 exports.signUp = signUp;
@@ -99,10 +98,21 @@ const userProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.userProfile = userProfile;
+const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield user_model_1.default.find();
+        return res.status(200).json(users);
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+});
+exports.getUsers = getUsers;
 exports.default = {
     signUp: exports.signUp,
     signIn: exports.signIn,
     confirmEmail: exports.confirmEmail,
     updateProfile: exports.updateProfile,
     userProfile: exports.userProfile,
+    getUsers: exports.getUsers
 };

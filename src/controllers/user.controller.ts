@@ -27,7 +27,7 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
     const newUser = new User(req.body);
     newUser.code = rNum.toString();
     await newUser.save();
-    await sendMail(newUser.email, newUser.code.toString());
+    // await sendMail(newUser.email, newUser.code.toString());
     return res.status(201).json(newUser);
 }
 
@@ -92,10 +92,20 @@ export const userProfile = async (req: Request, res: Response): Promise<Response
     }
 }
 
+export const getUsers = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const users = await User.find();
+        return res.status(200).json(users);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+}
+
 export default {
     signUp,
     signIn,
     confirmEmail,
     updateProfile,
     userProfile,
+    getUsers
 }

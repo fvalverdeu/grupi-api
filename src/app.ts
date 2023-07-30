@@ -4,6 +4,9 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import placeRoutes from "./routes/place.routes";
+import visitRoutes from "./routes/visit.routes";
+
 import passport from "passport";
 import passportMiddleware from "./middlewares/passport";
 
@@ -28,7 +31,10 @@ app.get('/', (req, res) => {
     res.send(`THE API is at http://localhost:${app.get('port')}`);
 });
 
-app.use(authRoutes);
-app.use(userRoutes);
+app.use('/assets', express.static('src/assets'));
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/places', placeRoutes);
+app.use('/api/visits', visitRoutes);
 
 export default app;
