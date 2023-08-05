@@ -27,7 +27,7 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
     const newUser = new User(req.body);
     newUser.code = rNum.toString();
     await newUser.save();
-    // await sendMail(newUser.email, newUser.code.toString());
+    await sendMail(newUser.email, newUser.code.toString());
     return res.status(201).json(newUser);
 }
 
