@@ -20,15 +20,36 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
     if (user) {
         return res.status(400).json({ msg: 'The user already exists' });
     }
-    const min = 100000;
-    const max = 999999;
-    const rNum = Math.floor(Math.random() * (max - min + 1) + min);
-
     const newUser = new User(req.body);
-    newUser.code = rNum.toString();
+    newUser.code = generateCode();
     await newUser.save();
     await sendMail(newUser.email, newUser.code.toString());
     return res.status(201).json(newUser);
+}
+
+export const sendCode = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        if (!req.body.userId) {
+            return res.status(400).json({ msg: 'Please. Send your userId' });
+        }
+        const { userId } = req.body;
+        const user = await User.findOne({ userId });
+        if (!user) {
+            return res.status(400).json({ msg: 'The user not exists' });
+        }
+        const code = generateCode();
+        const userUpdate = await User.findOneAndUpdate({ id: userId }, { code }, { new: true });
+        if (userUpdate?.email) {
+            await sendMail(userUpdate.email, userUpdate?.code.toString() as string);
+            return res.status(200).json({ msg: 'Se ha enviado el código de verificación a su correo' });
+        } else {
+            return res.status(400).json({ msg: 'No se encontró un correo para este usuario.' });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: 'Error al enviar el código' });
+    }
+
 }
 
 export const signIn = async (req: Request, res: Response): Promise<Response> => {
@@ -101,11 +122,20 @@ export const getUsers = async (req: Request, res: Response): Promise<Response> =
     }
 }
 
+function generateCode(): string {
+    const min = 100000;
+    const max = 999999;
+    const rNum = Math.floor(Math.random() * (max - min + 1) + min);
+    const code = rNum.toString();
+    return code;
+}
+
 export default {
     signUp,
     signIn,
     confirmEmail,
     updateProfile,
     userProfile,
-    getUsers
+    getUsers,
+    sendCode,
 }
