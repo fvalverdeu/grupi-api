@@ -1,11 +1,11 @@
 import { Router } from "express";
 const router = Router();
 
-import { confirmEmail, sendCode, signIn, signUp } from "../controllers/user.controller";
+import Controller from "../controllers/user.controller";
 
-router.post('/signin', signIn);
-router.post('/signup', signUp);
-router.post('/confirm', confirmEmail);
-router.post('/send-code', sendCode); // validar seguridad de envío mediante token
+router.post('/signin', Controller.signIn);
+router.post('/signup', Controller.signUp);
+router.post('/confirm', Controller.confirmEmail);
+router.post('/send-confirmation-code', Controller.sendCode);
 
 export default router;
