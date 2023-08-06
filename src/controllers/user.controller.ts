@@ -33,12 +33,12 @@ export const sendCode = async (req: Request, res: Response): Promise<Response> =
             return res.status(400).json({ msg: 'Please. Send your userId' });
         }
         const { userId } = req.body;
-        const user = await User.findOne({ userId });
+        const user = await User.findOne({ _id: userId });
         if (!user) {
             return res.status(400).json({ msg: 'The user not exists' });
         }
         const code = generateCode();
-        const userUpdate = await User.findOneAndUpdate({ id: userId }, { code }, { new: true });
+        const userUpdate = await User.findOneAndUpdate({ _id: userId }, { code }, { new: true });
         if (userUpdate?.email) {
             await sendMail(userUpdate.email, userUpdate?.code.toString() as string);
             return res.status(200).json({ msg: 'Se ha enviado el código de verificación a su correo' });
@@ -92,7 +92,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
         return res.status(400).json({ msg: 'No se enviaron datos del perfil.' });
     }
 
-    const user = await User.findOne({ id: req.body.id });
+    const user = await User.findOne({ _id: req.body.id });
     if (!user) {
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
@@ -104,7 +104,24 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
     }
 }
 
-export const userProfile = async (req: Request, res: Response): Promise<Response> => {
+export const updatePlaces = async (req: Request, res: Response): Promise<Response> => {
+    if (!req.body.places) {
+        return res.status(400).json({ msg: 'No se enviaron datos de los lugares.' });
+    }
+
+    const user = await User.findOne({ _id: req.body.id });
+    if (!user) {
+        return res.status(400).json({ msg: 'El usuario no existe' });
+    }
+    try {
+        await User.findOneAndUpdate({ _id: user.id }, { places: req.body.places }, { new: true });
+        return res.status(200).json({ confirm: true });
+    } catch (error) {
+        return res.status(400).json({ msg: 'Error al actualizar lugares' });
+    }
+}
+
+export const getUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const user = await User.findOne({ _id: req.params.id });
         return res.status(200).json(user);
@@ -122,6 +139,25 @@ export const getUsers = async (req: Request, res: Response): Promise<Response> =
     }
 }
 
+export const updateImage = async (req: Request, res: Response): Promise<Response> => {
+    const _id = req.params.id;
+    if (!_id) {
+        return res.status(400).json({ msg: 'No se enviaron datos del usuario.' });
+    }
+
+    const user = await User.findOne({ _id: req.body.id });
+    if (!user) {
+        return res.status(400).json({ msg: 'El usuario no existe' });
+    }
+    try {
+        user.profile.imageUrl = `uploads/users/${_id}`
+        await User.findOneAndUpdate({ _id: user.id }, { profile: user.profile }, { new: true });
+        return res.status(200).json({ confirm: true });
+    } catch (error) {
+        return res.status(400).json({ msg: 'The code is incorrect' });
+    }
+}
+
 function generateCode(): string {
     const min = 100000;
     const max = 999999;
@@ -135,7 +171,9 @@ export default {
     signIn,
     confirmEmail,
     updateProfile,
-    userProfile,
+    updatePlaces,
+    getUser,
     getUsers,
     sendCode,
+    updateImage,
 }

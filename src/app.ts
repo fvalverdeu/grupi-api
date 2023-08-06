@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import placeRoutes from "./routes/place.routes";
 import visitRoutes from "./routes/visit.routes";
+import contactRoutes from "./routes/contact.routes";
 
 import passport from "passport";
 import passportMiddleware from "./middlewares/passport";
@@ -36,5 +37,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/places', placeRoutes);
 app.use('/api/visits', visitRoutes);
+app.use('/api/contacts', contactRoutes);
 
 export default app;

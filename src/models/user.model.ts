@@ -1,15 +1,17 @@
 import { model, Schema } from "mongoose";
 
 import bcrypt from 'bcrypt';
-import { IUser, IUserProfile } from "../interfaces/user.interface";
+import { IProfile, IUser } from "../interfaces/user.interface";
 import { EUserStatus } from "../constants/user.enum";
+import { IPlace } from "../interfaces/place.interface";
 
 const userSchema = new Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
     status: { type: String, required: true, default: EUserStatus.UNVERIFIED },
-    // profile: { type: Object as () => IUserProfile, required: false }
+    profile: { type: Object as () => IProfile, required: false },
+    places: [{ type: Object as () => IPlace, required: false }],
 });
 
 userSchema.pre<IUser>('save', async function (next) {
