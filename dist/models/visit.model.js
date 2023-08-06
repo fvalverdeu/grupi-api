@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const visitSchema = new mongoose_1.Schema({
-    idGrupi: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
+    idUser: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
     idPlace: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Place', required: true },
     visitStart: { type: Date, required: false },
     visitEnd: { type: Date, required: false },

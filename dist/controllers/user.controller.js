@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUsers = exports.userProfile = exports.updateProfile = exports.confirmEmail = exports.signIn = exports.signUp = void 0;
+exports.updateImage = exports.getUsers = exports.getUser = exports.updatePlaces = exports.updateProfile = exports.confirmEmail = exports.signIn = exports.sendCode = exports.signUp = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
+const mail_config_1 = require("../config/mail.config");
 const user_enum_1 = require("../constants/user.enum");
 function createToken(user) {
     return jsonwebtoken_1.default.sign({ id: user.id, email: user.email, status: user.status }, config_1.default.jwtSecret, {
@@ -30,16 +31,39 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (user) {
         return res.status(400).json({ msg: 'The user already exists' });
     }
-    const min = 100000;
-    const max = 999999;
-    const rNum = Math.floor(Math.random() * (max - min + 1) + min);
     const newUser = new user_model_1.default(req.body);
-    newUser.code = rNum.toString();
+    newUser.code = generateCode();
     yield newUser.save();
-    // await sendMail(newUser.email, newUser.code.toString());
+    yield (0, mail_config_1.sendMail)(newUser.email, newUser.code.toString());
     return res.status(201).json(newUser);
 });
 exports.signUp = signUp;
+const sendCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.body.userId) {
+            return res.status(400).json({ msg: 'Please. Send your userId' });
+        }
+        const { userId } = req.body;
+        const user = yield user_model_1.default.findOne({ _id: userId });
+        if (!user) {
+            return res.status(400).json({ msg: 'The user not exists' });
+        }
+        const code = generateCode();
+        const userUpdate = yield user_model_1.default.findOneAndUpdate({ _id: userId }, { code }, { new: true });
+        if (userUpdate === null || userUpdate === void 0 ? void 0 : userUpdate.email) {
+            yield (0, mail_config_1.sendMail)(userUpdate.email, userUpdate === null || userUpdate === void 0 ? void 0 : userUpdate.code.toString());
+            return res.status(200).json({ msg: 'Se ha enviado el código de verificación a su correo' });
+        }
+        else {
+            return res.status(400).json({ msg: 'No se encontró un correo para este usuario.' });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: 'Error al enviar el código' });
+    }
+});
+exports.sendCode = sendCode;
 const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.body.email || !req.body.password) {
         return res.status(400).json({ msg: 'Please. Send your email and password' });
@@ -75,7 +99,7 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     if (!req.body.profile) {
         return res.status(400).json({ msg: 'No se enviaron datos del perfil.' });
     }
-    const user = yield user_model_1.default.findOne({ id: req.body.id });
+    const user = yield user_model_1.default.findOne({ _id: req.body.id });
     if (!user) {
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
@@ -88,7 +112,24 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.updateProfile = updateProfile;
-const userProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updatePlaces = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.body.places) {
+        return res.status(400).json({ msg: 'No se enviaron datos de los lugares.' });
+    }
+    const user = yield user_model_1.default.findOne({ _id: req.body.id });
+    if (!user) {
+        return res.status(400).json({ msg: 'El usuario no existe' });
+    }
+    try {
+        yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { places: req.body.places }, { new: true });
+        return res.status(200).json({ confirm: true });
+    }
+    catch (error) {
+        return res.status(400).json({ msg: 'Error al actualizar lugares' });
+    }
+});
+exports.updatePlaces = updatePlaces;
+const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_model_1.default.findOne({ _id: req.params.id });
         return res.status(200).json(user);
@@ -97,7 +138,7 @@ const userProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(500).json({ message: 'Error en servidor' });
     }
 });
-exports.userProfile = userProfile;
+exports.getUser = getUser;
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield user_model_1.default.find();
@@ -108,11 +149,40 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getUsers = getUsers;
+const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _id = req.params.id;
+    if (!_id) {
+        return res.status(400).json({ msg: 'No se enviaron datos del usuario.' });
+    }
+    const user = yield user_model_1.default.findOne({ _id: req.body.id });
+    if (!user) {
+        return res.status(400).json({ msg: 'El usuario no existe' });
+    }
+    try {
+        user.profile.imageUrl = `uploads/users/${_id}`;
+        yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { profile: user.profile }, { new: true });
+        return res.status(200).json({ confirm: true });
+    }
+    catch (error) {
+        return res.status(400).json({ msg: 'The code is incorrect' });
+    }
+});
+exports.updateImage = updateImage;
+function generateCode() {
+    const min = 100000;
+    const max = 999999;
+    const rNum = Math.floor(Math.random() * (max - min + 1) + min);
+    const code = rNum.toString();
+    return code;
+}
 exports.default = {
     signUp: exports.signUp,
     signIn: exports.signIn,
     confirmEmail: exports.confirmEmail,
     updateProfile: exports.updateProfile,
-    userProfile: exports.userProfile,
-    getUsers: exports.getUsers
+    updatePlaces: exports.updatePlaces,
+    getUser: exports.getUser,
+    getUsers: exports.getUsers,
+    sendCode: exports.sendCode,
+    updateImage: exports.updateImage,
 };

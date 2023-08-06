@@ -20,7 +20,8 @@ const userSchema = new mongoose_1.Schema({
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
     status: { type: String, required: true, default: user_enum_1.EUserStatus.UNVERIFIED },
-    // profile: { type: Object as () => IUserProfile, required: false }
+    profile: { type: Object, required: false },
+    places: [{ type: Object, required: false }],
 });
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
