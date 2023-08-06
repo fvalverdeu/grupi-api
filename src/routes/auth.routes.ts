@@ -6,7 +6,6 @@ import { confirmEmail, sendCode, signIn, signUp } from "../controllers/user.cont
 router.post('/signin', signIn);
 router.post('/signup', signUp);
 router.post('/confirm', confirmEmail);
-// validar seguridad de envío mediante token
-router.post('/send-code', sendCode);
+router.post('/sendcode', sendCode); // validar seguridad de envío mediante token
 
 export default router;
