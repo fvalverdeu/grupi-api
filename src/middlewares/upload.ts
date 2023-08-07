@@ -1,13 +1,14 @@
 import fs from 'fs';
 const multer = require('multer');
+const path = require('path');
 // const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
     console.log(req)
-    const path = `./src/assets/users/${req.params.id}`;
+    const pathImage = path.join(__dirname, `./src/assets/users/${req.params.id}`);
     // fs.mkdirSync(path, { recursive: true })
-    fs.mkdir(path, err => cb(null, path));
+    fs.mkdir(pathImage, err => cb(null, pathImage));
   },
   filename: function (req: any, file: any, cb: any) {
     // cb(null, new Date().getTime() + '-' + file.originalname);
