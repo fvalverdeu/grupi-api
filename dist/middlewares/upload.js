@@ -9,13 +9,13 @@ const multer = require('multer');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         console.log(req);
-        const path = `./uploads/${req.params.category}/${req.params.id}`;
+        const path = `./users/${req.params.id}`;
         // fs.mkdirSync(path, { recursive: true })
         fs_1.default.mkdir(path, err => cb(null, path));
     },
     filename: function (req, file, cb) {
         // cb(null, new Date().getTime() + '-' + file.originalname);
-        // console.log(file);
+        console.log(file.originalname);
         cb(null, file.originalname);
     }
 });

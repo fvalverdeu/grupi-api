@@ -159,7 +159,8 @@ const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
     try {
-        user.profile.imageUrl = `uploads/users/${_id}`;
+        console.log('FILE ' + req);
+        user.profile.imageUrl = `users/${_id}/image.png`;
         yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { profile: user.profile }, { new: true });
         return res.status(200).json({ confirm: true });
     }
