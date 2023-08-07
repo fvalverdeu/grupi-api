@@ -150,6 +150,7 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getUsers = getUsers;
 const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('REQUEST IN CONTROLLER: ' + req);
     const _id = req.params.id;
     if (!_id) {
         console.log('ERROR: No se enviaron datos del usuario', req);

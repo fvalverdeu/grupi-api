@@ -5,14 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const multer = require('multer');
-const path = require('path');
+// const path = require('path');
 // const fs = require('fs');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(req);
-        const pathImage = path.join(__dirname, `./src/assets/users/${req.params.id}`);
+        // console.log(req)
+        // const pathImage = path.join(__dirname, `./src/assets/users/${req.params.id}`);
+        const path = `../assets/users/${req.params.id}`;
         // fs.mkdirSync(path, { recursive: true })
-        fs_1.default.mkdir(pathImage, err => cb(null, pathImage));
+        fs_1.default.mkdir(path, err => cb(null, path));
     },
     filename: function (req, file, cb) {
         // cb(null, new Date().getTime() + '-' + file.originalname);

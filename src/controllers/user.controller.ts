@@ -140,6 +140,7 @@ export const getUsers = async (req: Request, res: Response): Promise<Response> =
 }
 
 export const updateImage = async (req: Request, res: Response): Promise<Response> => {
+    console.log('REQUEST IN CONTROLLER: ' + req);
     const _id = req.params.id;
     if (!_id) {
         console.log('ERROR: No se enviaron datos del usuario', req);

@@ -20,8 +20,16 @@ const userSchema = new mongoose_1.Schema({
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
     status: { type: String, required: true, default: user_enum_1.EUserStatus.UNVERIFIED },
-    profile: { type: Object, required: false },
-    places: [{ type: Object, required: false }],
+    profile: {
+        name: { type: String },
+        lastname: { type: String },
+        birthdate: { type: Date },
+        address: { type: String },
+        gender: { type: Number },
+        imageUrl: { type: String },
+        preferenceList: [{ label: { type: String } }],
+    },
+    places: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Place' }],
 });
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {

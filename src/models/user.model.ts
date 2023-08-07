@@ -10,8 +10,16 @@ const userSchema = new Schema({
     password: { type: String, required: true },
     code: { type: String, required: true, default: '' },
     status: { type: String, required: true, default: EUserStatus.UNVERIFIED },
-    profile: { type: Object as () => IProfile, required: false },
-    places: [{ type: Object as () => IPlace, required: false }],
+    profile: {
+        name: { type: String },
+        lastname: { type: String },
+        birthdate: { type: Date },
+        address: { type: String },
+        gender: { type: Number },
+        imageUrl: { type: String },
+        preferenceList: [{ label: { type: String } }],
+    },
+    places: [{ type: Schema.Types.ObjectId, ref: 'Place' }],
 });
 
 userSchema.pre<IUser>('save', async function (next) {
