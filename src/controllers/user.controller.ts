@@ -142,11 +142,13 @@ export const getUsers = async (req: Request, res: Response): Promise<Response> =
 export const updateImage = async (req: Request, res: Response): Promise<Response> => {
     const _id = req.params.id;
     if (!_id) {
+        console.log('ERROR: No se enviaron datos del usuario', req);
         return res.status(400).json({ msg: 'No se enviaron datos del usuario.' });
     }
 
-    const user = await User.findOne({ _id: req.body.id });
+    const user = await User.findOne({ _id: req.params.id });
     if (!user) {
+        console.log('El usuario no existe');
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
     try {
@@ -155,7 +157,8 @@ export const updateImage = async (req: Request, res: Response): Promise<Response
         await User.findOneAndUpdate({ _id: user.id }, { profile: user.profile }, { new: true });
         return res.status(200).json({ confirm: true });
     } catch (error) {
-        return res.status(400).json({ msg: 'The code is incorrect' });
+        console.log('ERROR: Error al actualizar datos del usuario.' + error);
+        return res.status(400).json({ msg: 'Error al actualizar datos del usuario.' });
     }
 }
 

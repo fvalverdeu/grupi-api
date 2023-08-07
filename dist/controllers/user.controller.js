@@ -152,10 +152,12 @@ exports.getUsers = getUsers;
 const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const _id = req.params.id;
     if (!_id) {
+        console.log('ERROR: No se enviaron datos del usuario', req);
         return res.status(400).json({ msg: 'No se enviaron datos del usuario.' });
     }
-    const user = yield user_model_1.default.findOne({ _id: req.body.id });
+    const user = yield user_model_1.default.findOne({ _id: req.params.id });
     if (!user) {
+        console.log('El usuario no existe');
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
     try {
@@ -165,7 +167,8 @@ const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(200).json({ confirm: true });
     }
     catch (error) {
-        return res.status(400).json({ msg: 'The code is incorrect' });
+        console.log('ERROR: Error al actualizar datos del usuario.' + error);
+        return res.status(400).json({ msg: 'Error al actualizar datos del usuario.' });
     }
 });
 exports.updateImage = updateImage;
