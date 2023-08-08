@@ -104,8 +104,8 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
     try {
-        // await User.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile, status: EUserStatus.ACTIVE }, { new: true });
-        yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile }, { new: true });
+        yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile, status: user_enum_1.EUserStatus.ACTIVE }, { new: true });
+        // await User.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile }, { new: true });
         return res.status(200).json({ confirm: true });
     }
     catch (error) {
