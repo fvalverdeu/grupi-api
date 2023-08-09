@@ -15,5 +15,5 @@ router.put('/:id', visit_controller_1.default.updateVisit);
 router.delete('/:id', authValidate, visit_controller_1.default.deleteVisit);
 router.get('/:id', authValidate, visit_controller_1.default.getVisit);
 router.get('/place/:id', visit_controller_1.default.getVisitsByPlaceId);
-router.get('/place/:id/statistics', visit_controller_1.default.getVisitsStatisticsByPlaceId);
+router.post('/place/:id/statistics', visit_controller_1.default.getVisitsStatisticsByPlaceId);
 exports.default = router;
