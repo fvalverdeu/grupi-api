@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
     res.send(`THE API is at http://localhost:${app.get('port')}`);
 });
 
-app.use('/assets', express.static('src/assets'));
+app.use('/assets', express.static('dist/assets'));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/places', placeRoutes);

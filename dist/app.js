@@ -28,7 +28,7 @@ passport_1.default.use(passport_2.default);
 app.get('/', (req, res) => {
     res.send(`THE API is at http://localhost:${app.get('port')}`);
 });
-app.use('/assets', express_1.default.static('src/assets'));
+app.use('/assets', express_1.default.static('dist/assets'));
 app.use('/api/auth', auth_routes_1.default);
 app.use('/api/users', user_routes_1.default);
 app.use('/api/places', place_routes_1.default);
