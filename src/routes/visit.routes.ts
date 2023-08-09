@@ -11,5 +11,6 @@ router.get('/:id', authValidate, Controller.getVisit);
 router.post('/', Controller.createVisit);
 router.put('/:id', Controller.updateVisit);
 router.delete('/:id', authValidate, Controller.deleteVisit);
-
+router.get('/:id', authValidate, Controller.getVisit);
+router.get('/place/:id', Controller.getVisitsByPlaceId);
 export default router;

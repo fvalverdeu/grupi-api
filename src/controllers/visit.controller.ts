@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Visit from "../models/visit.model";
+import Place from "../models/place.model";
 
 export const getVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -15,6 +16,18 @@ export const getVisits = async (req: Request, res: Response): Promise<Response> 
         const visits = await Visit.find();
         return res.status(200).json(visits);
     } catch (error) {
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+}
+
+
+export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        // const place = await Place.findOne({ _id: req.params.id });
+        const visits = await Visit.find({ idPlace: req.params.id }).populate('idGrupi');
+        return res.status(200).json(visits);
+    } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 }
@@ -57,4 +70,5 @@ export default {
     createVisit,
     updateVisit,
     deleteVisit,
+    getVisitsByPlaceId,
 }
