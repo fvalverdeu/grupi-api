@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Visit from "../models/visit.model";
 import User from "../models/user.model";
-import { IProfile } from "../interfaces/user.interface";
 
 export const getVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -21,8 +20,18 @@ export const getVisits = async (req: Request, res: Response): Promise<Response> 
     }
 }
 
-
 export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        // const place = await Place.findOne({ _id: req.params.id });
+        const visits = await Visit.find({ idPlace: req.params.id }).populate('idGrupi');
+        return res.status(200).json(visits);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+}
+
+export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
     try {
         const user = await User.findOne({ _id: req.body.idUser });
         const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
@@ -62,7 +71,7 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
         data.malePercent = Math.round((totalMale / profiles.length) * 100);
         data.notBinaryPercent = Math.round((totalNotBinary / profiles.length) * 100);
         data.preferencesPercent = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
-        data.ageAverage = Math.round((totalAge / profiles.length) * 100);
+        data.ageAverage = Math.round((totalAge / profiles.length));
         return res.status(200).json(data);
     } catch (error) {
         console.log(error);
@@ -109,4 +118,5 @@ export default {
     updateVisit,
     deleteVisit,
     getVisitsByPlaceId,
+    getVisitsStatisticsByPlaceId,
 }

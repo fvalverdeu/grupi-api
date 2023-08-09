@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteVisit = exports.updateVisit = exports.createVisit = exports.getVisitsByPlaceId = exports.getVisits = exports.getVisit = void 0;
+exports.deleteVisit = exports.updateVisit = exports.createVisit = exports.getVisitsStatisticsByPlaceId = exports.getVisitsByPlaceId = exports.getVisits = exports.getVisit = void 0;
 const visit_model_1 = __importDefault(require("../models/visit.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const getVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -36,6 +36,18 @@ const getVisits = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getVisits = getVisits;
 const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // const place = await Place.findOne({ _id: req.params.id });
+        const visits = yield visit_model_1.default.find({ idPlace: req.params.id }).populate('idGrupi');
+        return res.status(200).json(visits);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+});
+exports.getVisitsByPlaceId = getVisitsByPlaceId;
+const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield user_model_1.default.findOne({ _id: req.body.idUser });
         const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
@@ -75,7 +87,7 @@ const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, funct
         data.malePercent = Math.round((totalMale / profiles.length) * 100);
         data.notBinaryPercent = Math.round((totalNotBinary / profiles.length) * 100);
         data.preferencesPercent = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
-        data.ageAverage = Math.round((totalAge / profiles.length) * 100);
+        data.ageAverage = Math.round((totalAge / profiles.length));
         return res.status(200).json(data);
     }
     catch (error) {
@@ -83,7 +95,7 @@ const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, funct
         return res.status(500).json({ message: 'Error en servidor' });
     }
 });
-exports.getVisitsByPlaceId = getVisitsByPlaceId;
+exports.getVisitsStatisticsByPlaceId = getVisitsStatisticsByPlaceId;
 const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newVisit = new visit_model_1.default(req.body);
@@ -128,4 +140,5 @@ exports.default = {
     updateVisit: exports.updateVisit,
     deleteVisit: exports.deleteVisit,
     getVisitsByPlaceId: exports.getVisitsByPlaceId,
+    getVisitsStatisticsByPlaceId: exports.getVisitsStatisticsByPlaceId,
 };
