@@ -25,6 +25,7 @@ export const createPlace = async (req: Request, res: Response): Promise<Response
         await newPlace.save();
         return res.status(200).json({ data: newPlace });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 }
