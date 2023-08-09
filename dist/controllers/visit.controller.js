@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteVisit = exports.updateVisit = exports.createVisit = exports.getVisitsByPlaceId = exports.getVisits = exports.getVisit = void 0;
 const visit_model_1 = __importDefault(require("../models/visit.model"));
+const user_model_1 = __importDefault(require("../models/user.model"));
 const getVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const visit = yield visit_model_1.default.findOne({ _id: req.params.id });
@@ -36,9 +37,46 @@ const getVisits = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getVisits = getVisits;
 const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const place = await Place.findOne({ _id: req.params.id });
-        const visits = yield visit_model_1.default.find({ idPlace: req.params.id }).populate('idGrupi');
-        return res.status(200).json(visits);
+        const user = yield user_model_1.default.findOne({ _id: req.body.idUser });
+        const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
+        let totalFemale = 0;
+        let totalMale = 0;
+        let totalNotBinary = 0;
+        let totalPreferences = 0;
+        let totalAge = 0;
+        const data = {
+            femalePercent: 0,
+            malePercent: 0,
+            notBinaryPercent: 0,
+            preferencesPercent: 0,
+            totalGrupies: 0,
+            ageAverage: 0,
+        };
+        const currentDate = new Date();
+        const listCommonPreferences = [];
+        let profiles = visits.map((item) => item.idGrupi.profile);
+        profiles.forEach(profile => {
+            profile.gender === 0 ? ++totalFemale : (profile.gender === 1 ? ++totalMale : ++totalNotBinary);
+            if (user) {
+                user.profile.preferenceList.forEach(preference => {
+                    if (profile.preferenceList.includes(preference)) {
+                        ++totalPreferences;
+                        if (!listCommonPreferences.includes(preference))
+                            listCommonPreferences.push(preference);
+                    }
+                });
+            }
+            var diff_ms = Date.now() - profile.birthdate.getTime();
+            var age_dt = new Date(diff_ms);
+            totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
+        });
+        data.totalGrupies = profiles.length;
+        data.femalePercent = Math.round((totalFemale / profiles.length) * 100);
+        data.malePercent = Math.round((totalMale / profiles.length) * 100);
+        data.notBinaryPercent = Math.round((totalNotBinary / profiles.length) * 100);
+        data.preferencesPercent = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
+        data.ageAverage = Math.round((totalAge / profiles.length) * 100);
+        return res.status(200).json(data);
     }
     catch (error) {
         console.log(error);
