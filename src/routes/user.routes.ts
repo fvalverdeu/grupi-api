@@ -8,6 +8,7 @@ import passport from "passport";
 const authValidate = passport.authenticate('jwt', { session: false });
 
 router.post('/user-profile', authValidate, Controller.updateProfile);
+router.put('/:id/confirm-permissions', authValidate, Controller.updateConfirmPermissions);
 router.post('/user-places', authValidate, Controller.updatePlaces);
 router.get('/:id', authValidate, Controller.getUser);
 router.get('/', Controller.getUsers);

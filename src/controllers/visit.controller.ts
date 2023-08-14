@@ -61,7 +61,6 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
                     }
                 });
             }
-
             var diff_ms = Date.now() - profile.birthdate.getTime();
             var age_dt = new Date(diff_ms);
             totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
