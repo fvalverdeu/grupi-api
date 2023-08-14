@@ -5,6 +5,7 @@ var EUserStatus;
 (function (EUserStatus) {
     EUserStatus["UNVERIFIED"] = "UNVERIFIED";
     EUserStatus["VERIFIED"] = "VERIFIED";
+    EUserStatus["PENDING"] = "PENDING";
     EUserStatus["ACTIVE"] = "ACTIVE";
     EUserStatus["INACTIVE"] = "INACTIVE";
 })(EUserStatus || (exports.EUserStatus = EUserStatus = {}));

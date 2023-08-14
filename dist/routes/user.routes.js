@@ -10,6 +10,7 @@ const user_controller_1 = __importDefault(require("../controllers/user.controlle
 const passport_1 = __importDefault(require("passport"));
 const authValidate = passport_1.default.authenticate('jwt', { session: false });
 router.post('/user-profile', authValidate, user_controller_1.default.updateProfile);
+router.put('/:id/confirm-permissions', authValidate, user_controller_1.default.updateConfirmPermissions);
 router.post('/user-places', authValidate, user_controller_1.default.updatePlaces);
 router.get('/:id', authValidate, user_controller_1.default.getUser);
 router.get('/', user_controller_1.default.getUsers);
