@@ -22,12 +22,12 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
 }
 
 export const updateConfirmPermissions = async (req: Request, res: Response): Promise<Response> => {
-    const user = await User.findOne({ _id: req.body.id });
+    const user = await User.findOne({ _id: req.params.id });
     if (!user) {
         return res.status(400).json({ msg: 'El usuario no existe' });
     }
     try {
-        await User.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile, status: EUserStatus.ACTIVE }, { new: true });
+        await User.findOneAndUpdate({ _id: user.id }, { status: EUserStatus.ACTIVE }, { new: true });
         // await User.findOneAndUpdate({ _id: user.id }, { profile: req.body.profile }, { new: true });
         return res.status(200).json({ confirm: true });
     } catch (error) {
