@@ -28,19 +28,19 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
 
 export const signIn = async (req: Request, res: Response): Promise<Response> => {
     if (!req.body.email || !req.body.password) {
-        return res.status(400).json({ msg: 'Please. Send your email and password' });
+        return res.status(400).json({ msg: 'Por favor, envíar usuario y contraseña.' });
     }
 
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-        return res.status(400).json({ msg: 'The user does not exists' });
+        return res.status(400).json({ msg: 'El usuario no existe.' });
     }
 
     const isMatch = await user.comparePassword(req.body.password);
     if (isMatch) {
         return res.status(200).json({ token: createToken(user) });
     }
-    return res.status(400).json({ msg: 'The email or password are incorrect' });
+    return res.status(400).json({ msg: 'El correo o el password son incorrectos.' });
 }
 
 export const sendCode = async (req: Request, res: Response): Promise<Response> => {
