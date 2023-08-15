@@ -9,10 +9,18 @@ const upload = require('../middlewares/upload');
 const user_controller_1 = __importDefault(require("../controllers/user.controller"));
 const passport_1 = __importDefault(require("passport"));
 const authValidate = passport_1.default.authenticate('jwt', { session: false });
-router.post('/user-profile', authValidate, user_controller_1.default.updateProfile);
-router.put('/:id/confirm-permissions', authValidate, user_controller_1.default.updateConfirmPermissions);
-router.post('/user-places', authValidate, user_controller_1.default.updatePlaces);
-router.get('/:id', authValidate, user_controller_1.default.getUser);
-router.get('/', user_controller_1.default.getUsers);
+router.post('/user-profile', user_controller_1.default.updateProfile);
+router.put('/:id/confirm-permissions', user_controller_1.default.updateConfirmPermissions);
+router.post('/user-places', user_controller_1.default.updatePlaces);
+router.get('/:id', user_controller_1.default.getUser);
+router.get('/', authValidate, user_controller_1.default.getUsers);
 router.put("/:id/image", upload.image.single('image'), user_controller_1.default.updateImage);
+router.use((err, req, res, next) => {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({ message: 'Token inválido o no proporcionado' });
+    }
+    else {
+        next(err);
+    }
+});
 exports.default = router;

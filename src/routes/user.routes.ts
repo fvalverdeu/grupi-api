@@ -7,11 +7,19 @@ import passport from "passport";
 
 const authValidate = passport.authenticate('jwt', { session: false });
 
-router.post('/user-profile', authValidate, Controller.updateProfile);
-router.put('/:id/confirm-permissions', authValidate, Controller.updateConfirmPermissions);
-router.post('/user-places', authValidate, Controller.updatePlaces);
-router.get('/:id', authValidate, Controller.getUser);
-router.get('/', Controller.getUsers);
+router.post('/user-profile', Controller.updateProfile);
+router.put('/:id/confirm-permissions', Controller.updateConfirmPermissions);
+router.post('/user-places', Controller.updatePlaces);
+router.get('/:id', Controller.getUser);
+router.get('/', authValidate, Controller.getUsers);
 router.put("/:id/image", upload.image.single('image'), Controller.updateImage);
+
+router.use((err: any, req: any, res: any, next: any) => {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({ message: 'Token inválido o no proporcionado' });
+    } else {
+        next(err);
+    }
+});
 
 export default router;
