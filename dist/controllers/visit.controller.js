@@ -38,7 +38,8 @@ exports.getVisits = getVisits;
 const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // const place = await Place.findOne({ _id: req.params.id });
-        const visits = yield visit_model_1.default.find({ idPlace: req.params.id }).populate('idGrupi');
+        const searchTerm = req.query.status;
+        const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi');
         return res.status(200).json(visits);
     }
     catch (error) {

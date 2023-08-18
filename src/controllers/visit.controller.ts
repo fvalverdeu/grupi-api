@@ -23,7 +23,8 @@ export const getVisits = async (req: Request, res: Response): Promise<Response> 
 export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
     try {
         // const place = await Place.findOne({ _id: req.params.id });
-        const visits = await Visit.find({ idPlace: req.params.id }).populate('idGrupi');
+        const searchTerm = req.query.status;
+        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi');
         return res.status(200).json(visits);
     } catch (error) {
         console.log(error);
