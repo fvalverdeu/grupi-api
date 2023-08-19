@@ -54,7 +54,7 @@ export const deleteContact = async (req: Request, res: Response): Promise<Respon
 
 export const getContactsOfUser = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const contacts = await Contact.find({ $or: [{ idSender: req.params.id, status: EContactStatus.ACCEPT }, { idPReceptor: req.params.id, status: EContactStatus.ACCEPT }] });
+        const contacts = await Contact.find({ $or: [{ idSender: req.params.id, status: EContactStatus.ACCEPT }, { idReceptor: req.params.id, status: EContactStatus.ACCEPT }] });
         return res.status(200).json(contacts);
     } catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });
@@ -63,7 +63,7 @@ export const getContactsOfUser = async (req: Request, res: Response): Promise<Re
 
 export const getRequestsRecived = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const contacts = await Contact.find({ $or: [{ idPReceptor: req.params.id }] });
+        const contacts = await Contact.find({ $or: [{ idReceptor: req.params.id }] });
         return res.status(200).json(contacts);
     } catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });

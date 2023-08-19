@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Visit from "../models/visit.model";
 import User from "../models/user.model";
+import Contact from "../models/contact.model";
+import { EContactStatus } from "../constants/contact.enum";
 
 export const getVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -22,10 +24,20 @@ export const getVisits = async (req: Request, res: Response): Promise<Response> 
 
 export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
     try {
-        // const place = await Place.findOne({ _id: req.params.id });
+        const idUser = req.body.idUser;
         const searchTerm = req.query.status;
-        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi');
-        return res.status(200).json(visits);
+        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi') as any[];
+        const contacts = await Contact.find({ $or: [{ idSender: idUser, status: EContactStatus.ACCEPT }, { idReceptor: idUser, status: EContactStatus.ACCEPT }] });
+        const list = visits.map(item => {
+            const grupi = {
+                id: item.idGrupi._id,
+                profile: item.idGrupi.profile,
+                places: item.idGrupi.places,
+                isContact: contacts.some(contact => (contact.idSender == item.idGrupi._id || contact.idReceptor == item.idGrupi._id))
+            }
+            return grupi;
+        })
+        return res.status(200).json(list);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });

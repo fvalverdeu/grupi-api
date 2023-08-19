@@ -74,7 +74,7 @@ const deleteContact = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.deleteContact = deleteContact;
 const getContactsOfUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const contacts = yield contact_model_1.default.find({ $or: [{ idSender: req.params.id, status: contact_enum_1.EContactStatus.ACCEPT }, { idPReceptor: req.params.id, status: contact_enum_1.EContactStatus.ACCEPT }] });
+        const contacts = yield contact_model_1.default.find({ $or: [{ idSender: req.params.id, status: contact_enum_1.EContactStatus.ACCEPT }, { idReceptor: req.params.id, status: contact_enum_1.EContactStatus.ACCEPT }] });
         return res.status(200).json(contacts);
     }
     catch (error) {
@@ -84,7 +84,7 @@ const getContactsOfUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getContactsOfUser = getContactsOfUser;
 const getRequestsRecived = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const contacts = yield contact_model_1.default.find({ $or: [{ idPReceptor: req.params.id }] });
+        const contacts = yield contact_model_1.default.find({ $or: [{ idReceptor: req.params.id }] });
         return res.status(200).json(contacts);
     }
     catch (error) {

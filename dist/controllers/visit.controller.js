@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteVisit = exports.updateVisit = exports.createVisit = exports.getVisitsStatisticsByPlaceId = exports.getVisitsByPlaceId = exports.getVisits = exports.getVisit = void 0;
 const visit_model_1 = __importDefault(require("../models/visit.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
+const contact_model_1 = __importDefault(require("../models/contact.model"));
+const contact_enum_1 = require("../constants/contact.enum");
 const getVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const visit = yield visit_model_1.default.findOne({ _id: req.params.id });
@@ -37,10 +39,20 @@ const getVisits = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getVisits = getVisits;
 const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const place = await Place.findOne({ _id: req.params.id });
+        const idUser = req.body.idUser;
         const searchTerm = req.query.status;
         const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi');
-        return res.status(200).json(visits);
+        const contacts = yield contact_model_1.default.find({ $or: [{ idSender: idUser, status: contact_enum_1.EContactStatus.ACCEPT }, { idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }] });
+        const list = visits.map(item => {
+            const grupi = {
+                id: item.idGrupi._id,
+                profile: item.idGrupi.profile,
+                places: item.idGrupi.places,
+                isContact: contacts.some(contact => (contact.idSender == item.idGrupi._id || contact.idReceptor == item.idGrupi._id))
+            };
+            return grupi;
+        });
+        return res.status(200).json(list);
     }
     catch (error) {
         console.log(error);

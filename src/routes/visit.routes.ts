@@ -12,6 +12,6 @@ router.post('/', Controller.createVisit);
 router.put('/:id', Controller.updateVisit);
 router.delete('/:id', Controller.deleteVisit);
 router.get('/:id', Controller.getVisit);
-router.get('/place/:id', Controller.getVisitsByPlaceId);
+router.post('/place/:id', Controller.getVisitsByPlaceId);
 router.post('/place/:id/statistics', Controller.getVisitsStatisticsByPlaceId);
 export default router;
