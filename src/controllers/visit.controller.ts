@@ -25,9 +25,10 @@ export const getVisits = async (req: Request, res: Response): Promise<Response> 
 
 export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
     try {
+        const idPlace = req.params.id;
         const idUser = req.body.idUser;
         const searchTerm = req.query.status;
-        const place = await Place.findOne({ idPlace: req.params.id });
+        const place = await Place.findOne({ _id: idPlace });
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }

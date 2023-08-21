@@ -40,9 +40,10 @@ const getVisits = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getVisits = getVisits;
 const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const idPlace = req.params.id;
         const idUser = req.body.idUser;
         const searchTerm = req.query.status;
-        const place = yield place_model_1.default.findOne({ idPlace: req.params.id });
+        const place = yield place_model_1.default.findOne({ _id: idPlace });
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
