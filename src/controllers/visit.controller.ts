@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Visit from "../models/visit.model";
 import User from "../models/user.model";
 import Contact from "../models/contact.model";
+import Place from "../models/place.model";
 import { EContactStatus } from "../constants/contact.enum";
 
 export const getVisit = async (req: Request, res: Response): Promise<Response> => {
@@ -26,6 +27,10 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
     try {
         const idUser = req.body.idUser;
         const searchTerm = req.query.status;
+        const place = await Place.findOne({ idPlace: req.params.id });
+        if (!place) {
+            return res.status(400).json({ msg: 'El lugar no existe' });
+        }
         const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi') as any[];
         const contacts = await Contact.find({ $or: [{ idSender: idUser, status: EContactStatus.ACCEPT }, { idReceptor: idUser, status: EContactStatus.ACCEPT }] });
         const list = visits.map(item => {
@@ -37,7 +42,7 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
             }
             return grupi;
         })
-        return res.status(200).json(list);
+        return res.status(200).json({ idPlace: place._id, brandUrl: place.brandUrl, nroGrupis: list.length, list });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
