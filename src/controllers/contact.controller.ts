@@ -50,7 +50,7 @@ export const getContact = async (req: Request, res: Response): Promise<Response>
             id: idContact,
             profile: contactProfile.profile,
             isContact: contact?.status,
-            places: yourPlaceList,
+            yourPlaces: yourPlaceList,
             contacts: yourContactList
         }
         return res.status(200).json(contactData);

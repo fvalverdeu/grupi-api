@@ -62,7 +62,7 @@ const getContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             id: idContact,
             profile: contactProfile.profile,
             isContact: contact === null || contact === void 0 ? void 0 : contact.status,
-            places: yourPlaceList,
+            yourPlaces: yourPlaceList,
             contacts: yourContactList
         };
         return res.status(200).json(contactData);
