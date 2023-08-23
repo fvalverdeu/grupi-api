@@ -7,7 +7,7 @@ import passport from "passport";
 const authValidate = passport.authenticate('jwt', { session: false });
 
 router.get('/', Controller.getContacts);
-router.get('/:id', authValidate, Controller.getContact);
+router.get('/:id', Controller.getContact);
 router.post('/', Controller.createContact);
 router.put('/:id', Controller.updateContact);
 router.delete('/:id', authValidate, Controller.deleteContact);

@@ -9,7 +9,7 @@ const contact_controller_1 = __importDefault(require("../controllers/contact.con
 const passport_1 = __importDefault(require("passport"));
 const authValidate = passport_1.default.authenticate('jwt', { session: false });
 router.get('/', contact_controller_1.default.getContacts);
-router.get('/:id', authValidate, contact_controller_1.default.getContact);
+router.get('/:id', contact_controller_1.default.getContact);
 router.post('/', contact_controller_1.default.createContact);
 router.put('/:id', contact_controller_1.default.updateContact);
 router.delete('/:id', authValidate, contact_controller_1.default.deleteContact);

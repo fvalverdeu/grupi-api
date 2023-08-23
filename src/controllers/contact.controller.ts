@@ -1,11 +1,59 @@
 import { Request, Response } from "express";
 import Contact from "../models/contact.model";
+import User from "../models/user.model";
+import Place from "../models/place.model";
+import Visit from "../models/visit.model";
 import { EContactStatus } from "../constants/contact.enum";
 
 export const getContact = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const contact = await Contact.findOne({ _id: req.params.id });
-        return res.status(200).json(contact);
+        const idContact = req.params.id;
+        const idUser = req.body.id;
+        const yourContactList: any[] = [];
+        const yourPlaceList: any[] = [];
+        const contactProfile = await User.findOne({ _id: idContact });
+        if (!contactProfile) return res.status(500).json({ message: 'El usuario no existe' });
+        const contact = await Contact.findOne({
+            $or: [{ idSender: idContact, idReceptor: idUser },
+            { idSender: idUser, idReceptor: idContact }
+            ]
+        });
+        if (contact?.status == EContactStatus.ACCEPT) {
+            const sendList = await Contact.find({ idSender: idContact, status: EContactStatus.ACCEPT }).populate('idSender') as any[];
+            const receptList = await Contact.find({ idReceptor: idContact, status: EContactStatus.ACCEPT }).populate('idReceptor') as any[];
+            sendList.forEach(item => {
+                const contactOfMyContact = {
+                    id: item.idSender._id,
+                    name: item.idSender.profile.name,
+                }
+                yourContactList.push(contactOfMyContact);
+            });
+            receptList.forEach(item => {
+                const contactOfMyContact = {
+                    id: item.idReceptor._id,
+                    name: item.idReceptor.profile.name,
+                }
+                yourContactList.push(contactOfMyContact);
+            });
+
+            const places = await Visit.find({ idGrupi: idContact }).populate('idPlace') as any[];
+            places.forEach(item => {
+                const place = {
+                    id: item.idPlace._id,
+                    name: item.idPlace.name,
+                    visitDate: item.visitStart,
+                }
+                yourPlaceList.push(place);
+            })
+        }
+        const contactData = {
+            id: idContact,
+            profile: contactProfile.profile,
+            isContact: contact?.status,
+            places: yourPlaceList,
+            contacts: yourContactList
+        }
+        return res.status(200).json(contactData);
     } catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });
     }

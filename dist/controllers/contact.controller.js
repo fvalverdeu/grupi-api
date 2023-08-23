@@ -14,11 +14,58 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRequestsRecived = exports.getContactsOfUser = exports.deleteContact = exports.updateContact = exports.createContact = exports.getContacts = exports.getContact = void 0;
 const contact_model_1 = __importDefault(require("../models/contact.model"));
+const user_model_1 = __importDefault(require("../models/user.model"));
+const visit_model_1 = __importDefault(require("../models/visit.model"));
 const contact_enum_1 = require("../constants/contact.enum");
 const getContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const contact = yield contact_model_1.default.findOne({ _id: req.params.id });
-        return res.status(200).json(contact);
+        const idContact = req.params.id;
+        const idUser = req.body.id;
+        const yourContactList = [];
+        const yourPlaceList = [];
+        const contactProfile = yield user_model_1.default.findOne({ _id: idContact });
+        if (!contactProfile)
+            return res.status(500).json({ message: 'El usuario no existe' });
+        const contact = yield contact_model_1.default.findOne({
+            $or: [{ idSender: idContact, idReceptor: idUser },
+                { idSender: idUser, idReceptor: idContact }
+            ]
+        });
+        if ((contact === null || contact === void 0 ? void 0 : contact.status) == contact_enum_1.EContactStatus.ACCEPT) {
+            const sendList = yield contact_model_1.default.find({ idSender: idContact, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
+            const receptList = yield contact_model_1.default.find({ idReceptor: idContact, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idReceptor');
+            sendList.forEach(item => {
+                const contactOfMyContact = {
+                    id: item.idSender._id,
+                    name: item.idSender.profile.name,
+                };
+                yourContactList.push(contactOfMyContact);
+            });
+            receptList.forEach(item => {
+                const contactOfMyContact = {
+                    id: item.idReceptor._id,
+                    name: item.idReceptor.profile.name,
+                };
+                yourContactList.push(contactOfMyContact);
+            });
+            const places = yield visit_model_1.default.find({ idGrupi: idContact }).populate('idPlace');
+            places.forEach(item => {
+                const place = {
+                    id: item.idPlace._id,
+                    name: item.idPlace.name,
+                    visitDate: item.visitStart,
+                };
+                yourPlaceList.push(place);
+            });
+        }
+        const contactData = {
+            id: idContact,
+            profile: contactProfile.profile,
+            isContact: contact === null || contact === void 0 ? void 0 : contact.status,
+            places: yourPlaceList,
+            contacts: yourContactList
+        };
+        return res.status(200).json(contactData);
     }
     catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });
