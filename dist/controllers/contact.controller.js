@@ -23,6 +23,7 @@ const getContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const idUser = req.body.id;
         const yourContactList = [];
         const yourPlaceList = [];
+        let isContact = contact_enum_1.EContactStatus.NONE;
         const contactProfile = yield user_model_1.default.findOne({ _id: idContact });
         if (!contactProfile)
             return res.status(500).json({ message: 'El usuario no existe' });
@@ -31,6 +32,8 @@ const getContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 { idSender: idUser, idReceptor: idContact }
             ]
         });
+        if (contact)
+            isContact = contact.status;
         if ((contact === null || contact === void 0 ? void 0 : contact.status) == contact_enum_1.EContactStatus.ACCEPT) {
             const sendList = yield contact_model_1.default.find({ idSender: idContact, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
             const receptList = yield contact_model_1.default.find({ idReceptor: idContact, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idReceptor');
@@ -61,8 +64,8 @@ const getContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const contactData = {
             id: idContact,
             profile: contactProfile.profile,
-            isContact: contact === null || contact === void 0 ? void 0 : contact.status,
-            yourPlaces: yourPlaceList,
+            isContact: isContact,
+            places: yourPlaceList,
             contacts: yourContactList
         };
         return res.status(200).json(contactData);

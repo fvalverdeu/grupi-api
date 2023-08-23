@@ -11,6 +11,7 @@ export const getContact = async (req: Request, res: Response): Promise<Response>
         const idUser = req.body.id;
         const yourContactList: any[] = [];
         const yourPlaceList: any[] = [];
+        let isContact: string = EContactStatus.NONE;
         const contactProfile = await User.findOne({ _id: idContact });
         if (!contactProfile) return res.status(500).json({ message: 'El usuario no existe' });
         const contact = await Contact.findOne({
@@ -18,6 +19,7 @@ export const getContact = async (req: Request, res: Response): Promise<Response>
             { idSender: idUser, idReceptor: idContact }
             ]
         });
+        if (contact) isContact = contact.status;
         if (contact?.status == EContactStatus.ACCEPT) {
             const sendList = await Contact.find({ idSender: idContact, status: EContactStatus.ACCEPT }).populate('idSender') as any[];
             const receptList = await Contact.find({ idReceptor: idContact, status: EContactStatus.ACCEPT }).populate('idReceptor') as any[];
@@ -49,8 +51,8 @@ export const getContact = async (req: Request, res: Response): Promise<Response>
         const contactData = {
             id: idContact,
             profile: contactProfile.profile,
-            isContact: contact?.status,
-            yourPlaces: yourPlaceList,
+            isContact: isContact,
+            places: yourPlaceList,
             contacts: yourContactList
         }
         return res.status(200).json(contactData);
