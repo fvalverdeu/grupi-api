@@ -30,7 +30,6 @@ const sendMail = (email, code) => __awaiter(void 0, void 0, void 0, function* ()
         }
     });
     const imgData = fs_1.default.readFileSync('dist/assets/logo-email.png', { encoding: 'base64' });
-    console.log('IMAGEN', imgData);
     yield transporter.sendMail({
         from: mail.user,
         to: email,

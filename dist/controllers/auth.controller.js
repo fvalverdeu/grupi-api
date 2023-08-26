@@ -28,9 +28,9 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ msg: 'El usuario ya existe.' });
         }
         const newUser = new user_model_1.default(req.body);
-        newUser.code = generateCode();
+        // newUser.code = generateCode();
         yield newUser.save();
-        yield (0, mail_config_1.sendMail)(newUser.email, newUser.code.toString());
+        // await sendMail(newUser.email, newUser.code.toString());
         return res.status(201).json({ newUser, token: createToken(newUser) });
     }
     catch (error) {
@@ -90,7 +90,7 @@ const confirmEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     const isMatch = user.code.toString() === req.body.code;
     if (isMatch) {
-        yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { status: user_enum_1.EUserStatus.VERIFIED }, { new: true });
+        yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { status: user_enum_1.EUserStatus.VERIFIED, code: '' }, { new: true });
         return res.status(200).json({ confirm: true });
     }
     return res.status(400).json({ msg: 'The code is incorrect' });

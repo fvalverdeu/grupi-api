@@ -9,11 +9,14 @@ export const getContact = async (req: Request, res: Response): Promise<Response>
     try {
         const idContact = req.params.id;
         const idUser = req.body.id;
+        if (!idUser) return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
         const yourContactList: any[] = [];
         const yourPlaceList: any[] = [];
         let isContact: string = EContactStatus.NONE;
+        const user = await User.findOne({ _id: idUser });
+        if (!user) return res.status(500).json({ message: 'El usuario no existe.' + idUser });
         const contactProfile = await User.findOne({ _id: idContact });
-        if (!contactProfile) return res.status(500).json({ message: 'El usuario no existe' });
+        if (!contactProfile) return res.status(500).json({ message: 'El contacto no existe.' });
         const contact = await Contact.findOne({
             $or: [{ idSender: idContact, idReceptor: idUser },
             { idSender: idUser, idReceptor: idContact }

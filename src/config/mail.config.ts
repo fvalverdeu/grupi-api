@@ -18,8 +18,6 @@ export const sendMail = async (email: string, code: string) => {
     });
 
     const imgData = fs.readFileSync('dist/assets/logo-email.png', { encoding: 'base64' });
-    console.log('IMAGEN', imgData);
-
     await transporter.sendMail({
         from: mail.user,
         to: email,

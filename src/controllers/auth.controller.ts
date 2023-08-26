@@ -16,9 +16,9 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
             return res.status(400).json({ msg: 'El usuario ya existe.' });
         }
         const newUser = new User(req.body);
-        newUser.code = generateCode();
+        // newUser.code = generateCode();
         await newUser.save();
-        await sendMail(newUser.email, newUser.code.toString());
+        // await sendMail(newUser.email, newUser.code.toString());
         return res.status(201).json({ newUser, token: createToken(newUser) });
     } catch (error) {
         console.log(error);
@@ -79,7 +79,7 @@ export const confirmEmail = async (req: Request, res: Response): Promise<Respons
 
     const isMatch = user.code.toString() === req.body.code;
     if (isMatch) {
-        await User.findOneAndUpdate({ _id: user.id }, { status: EUserStatus.VERIFIED }, { new: true });
+        await User.findOneAndUpdate({ _id: user.id }, { status: EUserStatus.VERIFIED, code: '' }, { new: true });
         return res.status(200).json({ confirm: true });
     }
     return res.status(400).json({ msg: 'The code is incorrect' });

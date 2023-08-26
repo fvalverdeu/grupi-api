@@ -21,12 +21,17 @@ const getContact = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const idContact = req.params.id;
         const idUser = req.body.id;
+        if (!idUser)
+            return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
         const yourContactList = [];
         const yourPlaceList = [];
         let isContact = contact_enum_1.EContactStatus.NONE;
+        const user = yield user_model_1.default.findOne({ _id: idUser });
+        if (!user)
+            return res.status(500).json({ message: 'El usuario no existe.' + idUser });
         const contactProfile = yield user_model_1.default.findOne({ _id: idContact });
         if (!contactProfile)
-            return res.status(500).json({ message: 'El usuario no existe' });
+            return res.status(500).json({ message: 'El contacto no existe.' });
         const contact = yield contact_model_1.default.findOne({
             $or: [{ idSender: idContact, idReceptor: idUser },
                 { idSender: idUser, idReceptor: idContact }
