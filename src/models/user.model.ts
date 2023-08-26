@@ -1,9 +1,8 @@
 import { model, Schema } from "mongoose";
 
 import bcrypt from 'bcrypt';
-import { IProfile, IUser } from "../interfaces/user.interface";
+import { IUser } from "../interfaces/user.interface";
 import { EUserStatus } from "../constants/user.enum";
-import { IPlace } from "../interfaces/place.interface";
 
 const userSchema = new Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },

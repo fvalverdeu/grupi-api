@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const placeSchema = new mongoose_1.Schema({
-    name: { type: String, unique: true, required: true, lowercase: true, trim: true },
+    name: { type: String, unique: true, required: true, trim: true },
     address: { type: String, required: true },
     description: { type: String, required: true, default: '' },
     coords: { latitude: { type: String }, longitude: { type: String } },
