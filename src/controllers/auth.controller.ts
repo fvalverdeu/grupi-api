@@ -47,7 +47,7 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
 export const sendCode = async (req: Request, res: Response): Promise<Response> => {
     try {
         if (!req.body.email) {
-            return res.status(400).json({ msg: 'Please. Send your email' });
+            return res.status(400).json({ msg: 'Por favor, debe enviar su email' });
         }
         const { email } = req.body;
         const user = await User.findOne({ email: email });

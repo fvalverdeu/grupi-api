@@ -58,7 +58,7 @@ exports.signIn = signIn;
 const sendCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body.email) {
-            return res.status(400).json({ msg: 'Please. Send your email' });
+            return res.status(400).json({ msg: 'Por favor, debe enviar su email' });
         }
         const { email } = req.body;
         const user = yield user_model_1.default.findOne({ email: email });
