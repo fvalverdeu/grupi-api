@@ -63,7 +63,7 @@ const sendCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { email } = req.body;
         const user = yield user_model_1.default.findOne({ email: email });
         if (!user) {
-            return res.status(400).json({ msg: 'The user not exists' });
+            return res.status(400).json({ msg: 'El usuario no existe' });
         }
         const code = generateCode();
         const userUpdate = yield user_model_1.default.findOneAndUpdate({ _id: user._id }, { code }, { new: true });
@@ -87,14 +87,14 @@ const confirmEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     const user = yield user_model_1.default.findOne({ email: req.body.email });
     if (!user) {
-        return res.status(400).json({ msg: 'The user does not exists' });
+        return res.status(400).json({ msg: 'El usuario no existe' });
     }
     const isMatch = user.code.toString() === req.body.code;
     if (isMatch) {
         yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { status: user_enum_1.EUserStatus.VERIFIED, code: '' }, { new: true });
         return res.status(200).json({ confirm: true });
     }
-    return res.status(400).json({ msg: 'The code is incorrect' });
+    return res.status(400).json({ msg: 'El código es incorrecto' });
 });
 exports.confirmEmail = confirmEmail;
 function generateCode() {

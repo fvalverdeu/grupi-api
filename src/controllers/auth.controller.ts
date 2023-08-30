@@ -52,7 +52,7 @@ export const sendCode = async (req: Request, res: Response): Promise<Response> =
         const { email } = req.body;
         const user = await User.findOne({ email: email });
         if (!user) {
-            return res.status(400).json({ msg: 'The user not exists' });
+            return res.status(400).json({ msg: 'El usuario no existe' });
         }
         const code = generateCode();
         const userUpdate = await User.findOneAndUpdate({ _id: user._id }, { code }, { new: true });
@@ -75,7 +75,7 @@ export const confirmEmail = async (req: Request, res: Response): Promise<Respons
 
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-        return res.status(400).json({ msg: 'The user does not exists' });
+        return res.status(400).json({ msg: 'El usuario no existe' });
     }
 
     const isMatch = user.code.toString() === req.body.code;
@@ -83,7 +83,7 @@ export const confirmEmail = async (req: Request, res: Response): Promise<Respons
         await User.findOneAndUpdate({ _id: user.id }, { status: EUserStatus.VERIFIED, code: '' }, { new: true });
         return res.status(200).json({ confirm: true });
     }
-    return res.status(400).json({ msg: 'The code is incorrect' });
+    return res.status(400).json({ msg: 'El código es incorrecto' });
 }
 
 function generateCode(): string {
