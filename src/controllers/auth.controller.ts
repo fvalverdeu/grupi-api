@@ -103,22 +103,22 @@ function createToken(user: IUser) {
 
 export const recoverPassword = async (req: Request, res: Response): Promise<Response> => {
     try {
-        if (!req.body.password || !req.body.newPassword) {
+        if (!req.body.email || !req.body.newPassword) {
             return res.status(400).json({ msg: 'Por favor, envíar datos completos.' });
         }
 
-        const user = await User.findOne({ email: req.body.idUser });
+        const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(400).json({ msg: 'El usuario no existe.' });
         }
 
-        const isMatch = await user.comparePassword(req.body.password);
+        const isMatch = await user.comparePassword(req.body.newPassword);
         if (isMatch) {
             user.password = req.body.newPassword;
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(user.password, salt);
             user.password = hash;
-            const userUpdated = await User.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
+            const userUpdated = await User.findOneAndUpdate({ _id: user._id }, user, { new: true });
             if (userUpdated) return res.status(200).json({ confirm: true });
         }
         return res.status(400).json({ msg: 'El password es incorrecto.' });

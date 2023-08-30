@@ -111,20 +111,20 @@ function createToken(user) {
 }
 const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.body.password || !req.body.newPassword) {
+        if (!req.body.email || !req.body.newPassword) {
             return res.status(400).json({ msg: 'Por favor, envíar datos completos.' });
         }
-        const user = yield user_model_1.default.findOne({ email: req.body.idUser });
+        const user = yield user_model_1.default.findOne({ email: req.body.email });
         if (!user) {
             return res.status(400).json({ msg: 'El usuario no existe.' });
         }
-        const isMatch = yield user.comparePassword(req.body.password);
+        const isMatch = yield user.comparePassword(req.body.newPassword);
         if (isMatch) {
             user.password = req.body.newPassword;
             const salt = yield bcrypt_1.default.genSalt(10);
             const hash = yield bcrypt_1.default.hash(user.password, salt);
             user.password = hash;
-            const userUpdated = yield user_model_1.default.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
+            const userUpdated = yield user_model_1.default.findOneAndUpdate({ _id: user._id }, user, { new: true });
             if (userUpdated)
                 return res.status(200).json({ confirm: true });
         }
