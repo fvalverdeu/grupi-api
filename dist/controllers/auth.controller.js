@@ -18,6 +18,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
 const mail_config_1 = require("../config/mail.config");
 const user_enum_1 = require("../constants/user.enum");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body.email || !req.body.password) {
@@ -120,6 +121,9 @@ const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
         const isMatch = yield user.comparePassword(req.body.password);
         if (isMatch) {
             user.password = req.body.newPassword;
+            const salt = yield bcrypt_1.default.genSalt(10);
+            const hash = yield bcrypt_1.default.hash(user.password, salt);
+            user.password = hash;
             const userUpdated = yield user_model_1.default.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
             if (userUpdated)
                 return res.status(200).json(userUpdated);

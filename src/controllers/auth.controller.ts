@@ -5,6 +5,7 @@ import config from '../config/config';
 import { sendMail } from "../config/mail.config";
 import { IUser } from "../interfaces/user.interface";
 import { EUserStatus } from "../constants/user.enum";
+import bcrypt from 'bcrypt';
 
 export const signUp = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -114,6 +115,9 @@ export const recoverPassword = async (req: Request, res: Response): Promise<Resp
         const isMatch = await user.comparePassword(req.body.password);
         if (isMatch) {
             user.password = req.body.newPassword;
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(user.password, salt);
+            user.password = hash;
             const userUpdated = await User.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
             if (userUpdated) return res.status(200).json(userUpdated);
         }
