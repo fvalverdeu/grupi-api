@@ -46,16 +46,16 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
 
 export const sendCode = async (req: Request, res: Response): Promise<Response> => {
     try {
-        if (!req.body.userId) {
-            return res.status(400).json({ msg: 'Please. Send your userId' });
+        if (!req.body.email) {
+            return res.status(400).json({ msg: 'Please. Send your email' });
         }
-        const { userId } = req.body;
-        const user = await User.findOne({ _id: userId });
+        const { email } = req.body;
+        const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(400).json({ msg: 'The user not exists' });
         }
         const code = generateCode();
-        const userUpdate = await User.findOneAndUpdate({ _id: userId }, { code }, { new: true });
+        const userUpdate = await User.findOneAndUpdate({ _id: user._id }, { code }, { new: true });
         if (userUpdate?.email) {
             await sendMail(userUpdate.email, userUpdate?.code.toString() as string);
             return res.status(200).json({ msg: 'Se ha enviado el código de verificación a su correo' });
@@ -119,7 +119,7 @@ export const recoverPassword = async (req: Request, res: Response): Promise<Resp
             const hash = await bcrypt.hash(user.password, salt);
             user.password = hash;
             const userUpdated = await User.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
-            if (userUpdated) return res.status(200).json(userUpdated);
+            if (userUpdated) return res.status(200).json({ confirm: true });
         }
         return res.status(400).json({ msg: 'El password es incorrecto.' });
     } catch (error) {

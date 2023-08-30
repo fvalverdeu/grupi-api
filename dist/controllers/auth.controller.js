@@ -57,16 +57,16 @@ const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.signIn = signIn;
 const sendCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.body.userId) {
-            return res.status(400).json({ msg: 'Please. Send your userId' });
+        if (!req.body.email) {
+            return res.status(400).json({ msg: 'Please. Send your email' });
         }
-        const { userId } = req.body;
-        const user = yield user_model_1.default.findOne({ _id: userId });
+        const { email } = req.body;
+        const user = yield user_model_1.default.findOne({ email: email });
         if (!user) {
             return res.status(400).json({ msg: 'The user not exists' });
         }
         const code = generateCode();
-        const userUpdate = yield user_model_1.default.findOneAndUpdate({ _id: userId }, { code }, { new: true });
+        const userUpdate = yield user_model_1.default.findOneAndUpdate({ _id: user._id }, { code }, { new: true });
         if (userUpdate === null || userUpdate === void 0 ? void 0 : userUpdate.email) {
             yield (0, mail_config_1.sendMail)(userUpdate.email, userUpdate === null || userUpdate === void 0 ? void 0 : userUpdate.code.toString());
             return res.status(200).json({ msg: 'Se ha enviado el código de verificación a su correo' });
@@ -126,7 +126,7 @@ const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
             user.password = hash;
             const userUpdated = yield user_model_1.default.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
             if (userUpdated)
-                return res.status(200).json(userUpdated);
+                return res.status(200).json({ confirm: true });
         }
         return res.status(400).json({ msg: 'El password es incorrecto.' });
     }
