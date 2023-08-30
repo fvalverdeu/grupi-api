@@ -83,7 +83,7 @@ const sendCode = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.sendCode = sendCode;
 const confirmEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.body.email || !req.body.code) {
-        return res.status(400).json({ msg: 'Please. Send your email and code' });
+        return res.status(400).json({ msg: 'Por favor, Enviar el email y el código' });
     }
     const user = yield user_model_1.default.findOne({ email: req.body.email });
     if (!user) {

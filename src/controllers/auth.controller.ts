@@ -70,7 +70,7 @@ export const sendCode = async (req: Request, res: Response): Promise<Response> =
 
 export const confirmEmail = async (req: Request, res: Response): Promise<Response> => {
     if (!req.body.email || !req.body.code) {
-        return res.status(400).json({ msg: 'Please. Send your email and code' });
+        return res.status(400).json({ msg: 'Por favor, Enviar el email y el código' });
     }
 
     const user = await User.findOne({ email: req.body.email });
