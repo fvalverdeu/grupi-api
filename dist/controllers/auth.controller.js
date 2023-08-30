@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.confirmEmail = exports.sendCode = exports.signIn = exports.signUp = void 0;
+exports.recoverPassword = exports.confirmEmail = exports.sendCode = exports.signIn = exports.signUp = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
@@ -108,9 +108,34 @@ function createToken(user) {
         expiresIn: 86400
     });
 }
+const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.body.password || !req.body.newPassword) {
+            return res.status(400).json({ msg: 'Por favor, envíar datos completos.' });
+        }
+        const user = yield user_model_1.default.findOne({ email: req.body.idUser });
+        if (!user) {
+            return res.status(400).json({ msg: 'El usuario no existe.' });
+        }
+        const isMatch = yield user.comparePassword(req.body.password);
+        if (isMatch) {
+            user.password = req.body.newPassword;
+            const userUpdated = yield user_model_1.default.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
+            if (userUpdated)
+                return res.status(200).json(userUpdated);
+        }
+        return res.status(400).json({ msg: 'El password es incorrecto.' });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: 'Error al actualizar contraseña.' });
+    }
+});
+exports.recoverPassword = recoverPassword;
 exports.default = {
     signUp: exports.signUp,
     signIn: exports.signIn,
     confirmEmail: exports.confirmEmail,
     sendCode: exports.sendCode,
+    recoverPassword: exports.recoverPassword,
 };

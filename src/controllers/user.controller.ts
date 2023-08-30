@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import User from "../models/user.model";
 import { EUserStatus } from "../constants/user.enum";
+import Contact from "../models/contact.model";
+import Place from "../models/place.model";
+import Visit from "../models/visit.model";
+import { EContactStatus } from "../constants/contact.enum";
 
 export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
     if (!req.body.profile) {
@@ -95,6 +99,66 @@ export const updateImage = async (req: Request, res: Response): Promise<Response
     }
 }
 
+export const getUserInfo = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const idUser = req.params.id;
+        const yourContactList: any[] = [];
+        const yourPlaceList: any[] = [];
+        const yourFavoritePlaces: any[] = [];
+        if (!idUser) return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
+        const user = await User.findOne({ _id: idUser });
+        if (!user) return res.status(500).json({ message: 'El usuario no existe.' + idUser });
+
+        const sendList = await Contact.find({ idSender: idUser, status: EContactStatus.ACCEPT }).populate('idReceptor') as any[];
+        const receptList = await Contact.find({ idReceptor: idUser, status: EContactStatus.ACCEPT }).populate('idSender') as any[];
+        sendList.forEach(item => {
+            const userContact = {
+                id: item.idReceptor._id,
+                name: item.idReceptor.profile.name,
+            }
+            yourContactList.push(userContact);
+        });
+        receptList.forEach(item => {
+            const userContact = {
+                id: item.idSender._id,
+                name: item.idSender.profile.name,
+            }
+            yourContactList.push(userContact);
+        });
+
+        const places = await Visit.find({ idGrupi: idUser }).populate('idPlace') as any[];
+        places.forEach(item => {
+            const place = {
+                id: item.idPlace._id,
+                brandUrl: item.idPlace.brandUrl,
+                name: item.idPlace.name,
+                visitDate: item.visitStart,
+            }
+            yourPlaceList.push(place);
+        });
+        user.places.forEach((item: any) => {
+            const place = {
+                id: item._id,
+                brandUrl: item.brandUrl,
+                name: item.idPlace.name,
+                visitDate: item.visitStart,
+            }
+            yourFavoritePlaces.push(place);
+        })
+
+        const userData = {
+            id: idUser,
+            profile: user.profile,
+            lastPlaces: yourPlaceList.splice(0, 2),
+            favoritePlaces: yourFavoritePlaces,
+            contacts: yourContactList
+        }
+        return res.status(200).json(userData);
+    } catch (error) {
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+}
+
 export default {
     updateProfile,
     updatePlaces,
@@ -102,4 +166,5 @@ export default {
     getUsers,
     updateImage,
     updateConfirmPermissions,
+    getUserInfo,
 }

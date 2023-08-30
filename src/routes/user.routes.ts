@@ -13,6 +13,7 @@ router.post('/user-places', Controller.updatePlaces);
 router.get('/:id', Controller.getUser);
 router.get('/', authValidate, Controller.getUsers);
 router.put("/:id/image", upload.image.single('image'), Controller.updateImage);
+router.post('/user-info/:id', Controller.getUserInfo);
 
 router.use((err: any, req: any, res: any, next: any) => {
     if (err.name === 'UnauthorizedError') {

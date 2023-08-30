@@ -99,8 +99,20 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
 
 export const createVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
+        const { idGrupi, idPlace } = req.params;
+        const user = await User.findOne({ _id: idGrupi });
+        if (!user) return res.status(400).json({ msg: 'El usuario no existe' });
+        const place = await Place.findOne({ _id: idPlace });
+        if (!place) return res.status(400).json({ msg: 'El lugar no existe' });
+
         const newVisit = new Visit(req.body);
         await newVisit.save();
+        const number = await newVisit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        if (number > 3) {
+            const placesUpdate = user.places.push(place);
+            await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
+
+        }
         return res.status(200).json({ data: newVisit });
     } catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });

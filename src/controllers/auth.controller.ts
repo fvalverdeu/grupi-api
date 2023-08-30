@@ -100,9 +100,36 @@ function createToken(user: IUser) {
 }
 
 
+export const recoverPassword = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        if (!req.body.password || !req.body.newPassword) {
+            return res.status(400).json({ msg: 'Por favor, envíar datos completos.' });
+        }
+
+        const user = await User.findOne({ email: req.body.idUser });
+        if (!user) {
+            return res.status(400).json({ msg: 'El usuario no existe.' });
+        }
+
+        const isMatch = await user.comparePassword(req.body.password);
+        if (isMatch) {
+            user.password = req.body.newPassword;
+            const userUpdated = await User.findOneAndUpdate({ _id: req.body.idUser }, user, { new: true });
+            if (userUpdated) return res.status(200).json(userUpdated);
+        }
+        return res.status(400).json({ msg: 'El password es incorrecto.' });
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({ msg: 'Error al actualizar contraseña.' });
+    }
+
+}
+
+
 export default {
     signUp,
     signIn,
     confirmEmail,
     sendCode,
+    recoverPassword,
 }

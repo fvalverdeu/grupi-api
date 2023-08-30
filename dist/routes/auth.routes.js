@@ -10,4 +10,5 @@ router.post('/signin', auth_controller_1.default.signIn);
 router.post('/signup', auth_controller_1.default.signUp);
 router.post('/confirm', auth_controller_1.default.confirmEmail);
 router.post('/send-confirmation-code', auth_controller_1.default.sendCode);
+router.post('/recover-password', auth_controller_1.default.recoverPassword);
 exports.default = router;

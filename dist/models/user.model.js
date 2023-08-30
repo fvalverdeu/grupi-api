@@ -42,6 +42,22 @@ userSchema.pre('save', function (next) {
         next();
     });
 });
+userSchema.pre('findOneAndUpdate', function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = this;
+        if (!user.isModified('password'))
+            return next();
+        try {
+            const salt = yield bcrypt_1.default.genSalt(10);
+            const hash = yield bcrypt_1.default.hash(user.password, salt);
+            user.password = hash;
+            return next();
+        }
+        catch (error) {
+            console.log(error);
+        }
+    });
+});
 userSchema.methods.comparePassword = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield bcrypt_1.default.compare(password, this.password);

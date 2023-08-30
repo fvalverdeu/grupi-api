@@ -117,8 +117,20 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
 exports.getVisitsStatisticsByPlaceId = getVisitsStatisticsByPlaceId;
 const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { idGrupi, idPlace } = req.params;
+        const user = yield user_model_1.default.findOne({ _id: idGrupi });
+        if (!user)
+            return res.status(400).json({ msg: 'El usuario no existe' });
+        const place = yield place_model_1.default.findOne({ _id: idPlace });
+        if (!place)
+            return res.status(400).json({ msg: 'El lugar no existe' });
         const newVisit = new visit_model_1.default(req.body);
         yield newVisit.save();
+        const number = yield newVisit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        if (number > 3) {
+            const placesUpdate = user.places.push(place);
+            yield user_model_1.default.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
+        }
         return res.status(200).json({ data: newVisit });
     }
     catch (error) {

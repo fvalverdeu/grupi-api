@@ -12,9 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateImage = exports.getUsers = exports.getUser = exports.updatePlaces = exports.updateConfirmPermissions = exports.updateProfile = void 0;
+exports.getUserInfo = exports.updateImage = exports.getUsers = exports.getUser = exports.updatePlaces = exports.updateConfirmPermissions = exports.updateProfile = void 0;
 const user_model_1 = __importDefault(require("../models/user.model"));
 const user_enum_1 = require("../constants/user.enum");
+const contact_model_1 = __importDefault(require("../models/contact.model"));
+const visit_model_1 = __importDefault(require("../models/visit.model"));
+const contact_enum_1 = require("../constants/contact.enum");
 const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.body.profile) {
         return res.status(400).json({ msg: 'No se enviaron datos del perfil.' });
@@ -111,6 +114,66 @@ const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.updateImage = updateImage;
+const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idUser = req.params.id;
+        const yourContactList = [];
+        const yourPlaceList = [];
+        const yourFavoritePlaces = [];
+        if (!idUser)
+            return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
+        const user = yield user_model_1.default.findOne({ _id: idUser });
+        if (!user)
+            return res.status(500).json({ message: 'El usuario no existe.' + idUser });
+        const sendList = yield contact_model_1.default.find({ idSender: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idReceptor');
+        const receptList = yield contact_model_1.default.find({ idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
+        sendList.forEach(item => {
+            const userContact = {
+                id: item.idReceptor._id,
+                name: item.idReceptor.profile.name,
+            };
+            yourContactList.push(userContact);
+        });
+        receptList.forEach(item => {
+            const userContact = {
+                id: item.idSender._id,
+                name: item.idSender.profile.name,
+            };
+            yourContactList.push(userContact);
+        });
+        const places = yield visit_model_1.default.find({ idGrupi: idUser }).populate('idPlace');
+        places.forEach(item => {
+            const place = {
+                id: item.idPlace._id,
+                brandUrl: item.idPlace.brandUrl,
+                name: item.idPlace.name,
+                visitDate: item.visitStart,
+            };
+            yourPlaceList.push(place);
+        });
+        user.places.forEach((item) => {
+            const place = {
+                id: item._id,
+                brandUrl: item.brandUrl,
+                name: item.idPlace.name,
+                visitDate: item.visitStart,
+            };
+            yourFavoritePlaces.push(place);
+        });
+        const userData = {
+            id: idUser,
+            profile: user.profile,
+            lastPlaces: yourPlaceList.splice(0, 2),
+            favoritePlaces: yourFavoritePlaces,
+            contacts: yourContactList
+        };
+        return res.status(200).json(userData);
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+});
+exports.getUserInfo = getUserInfo;
 exports.default = {
     updateProfile: exports.updateProfile,
     updatePlaces: exports.updatePlaces,
@@ -118,4 +181,5 @@ exports.default = {
     getUsers: exports.getUsers,
     updateImage: exports.updateImage,
     updateConfirmPermissions: exports.updateConfirmPermissions,
+    getUserInfo: exports.getUserInfo,
 };

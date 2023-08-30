@@ -15,6 +15,7 @@ router.post('/user-places', user_controller_1.default.updatePlaces);
 router.get('/:id', user_controller_1.default.getUser);
 router.get('/', authValidate, user_controller_1.default.getUsers);
 router.put("/:id/image", upload.image.single('image'), user_controller_1.default.updateImage);
+router.post('/user-info/:id', user_controller_1.default.getUserInfo);
 router.use((err, req, res, next) => {
     if (err.name === 'UnauthorizedError') {
         res.status(401).json({ message: 'Token inválido o no proporcionado' });
