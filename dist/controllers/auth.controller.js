@@ -29,9 +29,9 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ msg: 'El usuario ya existe.' });
         }
         const newUser = new user_model_1.default(req.body);
-        // newUser.code = generateCode();
+        newUser.code = generateCode();
         yield newUser.save();
-        // await sendMail(newUser.email, newUser.code.toString());
+        yield (0, mail_config_1.sendMail)(newUser.email, newUser.code.toString());
         return res.status(201).json({ newUser, token: createToken(newUser) });
     }
     catch (error) {
