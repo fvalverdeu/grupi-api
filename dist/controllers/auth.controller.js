@@ -119,7 +119,7 @@ const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
             return res.status(400).json({ msg: 'El usuario no existe.' });
         }
         const isMatch = yield user.comparePassword(req.body.newPassword);
-        if (isMatch) {
+        if (!isMatch) {
             user.password = req.body.newPassword;
             const salt = yield bcrypt_1.default.genSalt(10);
             const hash = yield bcrypt_1.default.hash(user.password, salt);

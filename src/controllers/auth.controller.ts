@@ -113,7 +113,7 @@ export const recoverPassword = async (req: Request, res: Response): Promise<Resp
         }
 
         const isMatch = await user.comparePassword(req.body.newPassword);
-        if (isMatch) {
+        if (!isMatch) {
             user.password = req.body.newPassword;
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(user.password, salt);
