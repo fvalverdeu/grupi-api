@@ -128,7 +128,7 @@ const recoverPassword = (req, res) => __awaiter(void 0, void 0, void 0, function
             if (userUpdated)
                 return res.status(200).json({ confirm: true });
         }
-        return res.status(400).json({ msg: 'El password es incorrecto.' });
+        return res.status(400).json({ msg: 'Debe ingresar una contraseña diferente a la anterior.' });
     }
     catch (error) {
         console.log(error);

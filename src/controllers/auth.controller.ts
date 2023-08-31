@@ -121,7 +121,7 @@ export const recoverPassword = async (req: Request, res: Response): Promise<Resp
             const userUpdated = await User.findOneAndUpdate({ _id: user._id }, user, { new: true });
             if (userUpdated) return res.status(200).json({ confirm: true });
         }
-        return res.status(400).json({ msg: 'El password es incorrecto.' });
+        return res.status(400).json({ msg: 'Debe ingresar una contraseña diferente a la anterior.' });
     } catch (error) {
         console.log(error);
         return res.status(400).json({ msg: 'Error al actualizar contraseña.' });
