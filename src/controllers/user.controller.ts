@@ -90,7 +90,7 @@ export const updateImage = async (req: Request, res: Response): Promise<Response
     }
     try {
         console.log('FILE ' + req);
-        user.profile.imageUrl = `users/${_id}/image.png`
+        user.profile.imageUrl = `assets/users/${_id}/image.png`
         await User.findOneAndUpdate({ _id: user.id }, { profile: user.profile }, { new: true });
         return res.status(200).json({ confirm: true });
     } catch (error) {
