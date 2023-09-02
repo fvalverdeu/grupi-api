@@ -117,7 +117,7 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
 exports.getVisitsStatisticsByPlaceId = getVisitsStatisticsByPlaceId;
 const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { idGrupi, idPlace } = req.params;
+        const { idGrupi, idPlace } = req.body;
         const user = yield user_model_1.default.findOne({ _id: idGrupi });
         if (!user)
             return res.status(400).json({ msg: 'El usuario no existe' });

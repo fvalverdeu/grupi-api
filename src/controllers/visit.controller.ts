@@ -99,7 +99,7 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
 
 export const createVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const { idGrupi, idPlace } = req.params;
+        const { idGrupi, idPlace } = req.body;
         const user = await User.findOne({ _id: idGrupi });
         if (!user) return res.status(400).json({ msg: 'El usuario no existe' });
         const place = await Place.findOne({ _id: idPlace });
