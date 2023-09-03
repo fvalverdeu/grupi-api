@@ -11,7 +11,7 @@ const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const place_routes_1 = __importDefault(require("./routes/place.routes"));
 const visit_routes_1 = __importDefault(require("./routes/visit.routes"));
 const contact_routes_1 = __importDefault(require("./routes/contact.routes"));
-const contact_routes_2 = __importDefault(require("./routes/contact.routes"));
+const preference_routes_1 = __importDefault(require("./routes/preference.routes"));
 const passport_1 = __importDefault(require("passport"));
 const passport_2 = __importDefault(require("./middlewares/passport"));
 // initializations
@@ -35,5 +35,5 @@ app.use('/api/users', user_routes_1.default);
 app.use('/api/places', place_routes_1.default);
 app.use('/api/visits', visit_routes_1.default);
 app.use('/api/contacts', contact_routes_1.default);
-app.use('/api/preferences', contact_routes_2.default);
+app.use('/api/preferences', preference_routes_1.default);
 exports.default = app;

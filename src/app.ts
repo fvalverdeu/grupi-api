@@ -7,7 +7,7 @@ import userRoutes from "./routes/user.routes";
 import placeRoutes from "./routes/place.routes";
 import visitRoutes from "./routes/visit.routes";
 import contactRoutes from "./routes/contact.routes";
-import preferencesRoutes from "./routes/contact.routes";
+import preferencesRoutes from "./routes/preference.routes";
 
 import passport from "passport";
 import passportMiddleware from "./middlewares/passport";

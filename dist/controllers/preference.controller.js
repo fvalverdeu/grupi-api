@@ -41,7 +41,8 @@ const createPreference = (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(200).json({ data: newPreference });
     }
     catch (error) {
-        return res.status(500).json({ message: 'Error en servidor' });
+        console.log(error);
+        return res.status(500).json({ message: `Error en servidor + ${error}` });
     }
 });
 exports.createPreference = createPreference;
