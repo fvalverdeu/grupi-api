@@ -131,8 +131,8 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const totalVisits = yield visit_model_1.default.find({ idGrupi: req.body.idGrupi, idPlace: req.body.idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', totalVisits.length);
         if (totalVisits.length > 3) {
-            const index = user.places.findIndex((item) => item.id === newVisit._id);
-            if (index != 1) {
+            const index = user.places.findIndex((place) => place.id === newVisit.idPlace);
+            if (index === -1) {
                 const placesUpdate = user.places.push(place);
                 yield user_model_1.default.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
             }

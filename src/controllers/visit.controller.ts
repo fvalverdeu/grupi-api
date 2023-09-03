@@ -112,8 +112,8 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
         const totalVisits = await Visit.find({ idGrupi: req.body.idGrupi, idPlace: req.body.idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', totalVisits.length);
         if (totalVisits.length > 3) {
-            const index = user.places.findIndex((item: any) => item.id === newVisit._id);
-            if (index != 1) {
+            const index = user.places.findIndex((place: any) => place.id === newVisit.idPlace);
+            if (index === -1) {
                 const placesUpdate = user.places.push(place);
                 await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
             }
