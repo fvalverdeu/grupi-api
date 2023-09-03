@@ -140,6 +140,7 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(200).json({ data: newVisit });
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 });

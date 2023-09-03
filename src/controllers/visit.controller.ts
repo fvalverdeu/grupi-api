@@ -120,6 +120,7 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
         }
         return res.status(200).json({ data: newVisit });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 }
