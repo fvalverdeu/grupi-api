@@ -110,9 +110,11 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
         const number = await Visit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', number);
         if (number > 3) {
-            const placesUpdate = user.places.push(place);
-            await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
-
+            const index = user.places.findIndex((item: any) => item.id === newVisit._id);
+            if (index != 1) {
+                const placesUpdate = user.places.push(place);
+                await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
+            }
         }
         return res.status(200).json({ data: newVisit });
     } catch (error) {
