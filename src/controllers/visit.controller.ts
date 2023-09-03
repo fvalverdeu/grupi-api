@@ -108,6 +108,7 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
         const newVisit = new Visit(req.body);
         await newVisit.save();
         // const number = await Visit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace)
         const totalVisits = await Visit.find({ idGrupi: req.body.idGrupi, idPlace: req.body.idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', totalVisits.length);
         if (totalVisits.length > 3) {
