@@ -126,7 +126,8 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             return res.status(400).json({ msg: 'El lugar no existe' });
         const newVisit = new visit_model_1.default(req.body);
         yield newVisit.save();
-        const number = yield newVisit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        const number = yield visit_model_1.default.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        console.log('NUMBER VISITS :::::::::::::::::::: ', number);
         if (number > 3) {
             const placesUpdate = user.places.push(place);
             yield user_model_1.default.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });

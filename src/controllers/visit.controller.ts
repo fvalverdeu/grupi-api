@@ -107,7 +107,8 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
 
         const newVisit = new Visit(req.body);
         await newVisit.save();
-        const number = await newVisit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        const number = await Visit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        console.log('NUMBER VISITS :::::::::::::::::::: ', number);
         if (number > 3) {
             const placesUpdate = user.places.push(place);
             await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
