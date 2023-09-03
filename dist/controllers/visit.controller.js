@@ -127,7 +127,7 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const newVisit = new visit_model_1.default(req.body);
         yield newVisit.save();
         // const number = await Visit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
-        const totalVisits = yield visit_model_1.default.find({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
+        const totalVisits = yield visit_model_1.default.find({ idGrupi: req.body.idGrupi, idPlace: req.body.idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', totalVisits.length);
         if (totalVisits.length > 3) {
             const index = user.places.findIndex((item) => item.id === newVisit._id);
