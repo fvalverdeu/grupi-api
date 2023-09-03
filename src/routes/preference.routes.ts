@@ -6,10 +6,10 @@ import passport from "passport";
 
 const authValidate = passport.authenticate('jwt', { session: false });
 
-router.get('/', authValidate, Controller.getPreference);
-router.get('/:id', authValidate, Controller.getPreferences);
-router.post('/', authValidate, Controller.createPreference);
-router.put('/:id', authValidate, Controller.updatePreference);
-router.delete('/:id', authValidate, Controller.deletePreference);
+router.get('/', Controller.getPreference);
+router.get('/:id', Controller.getPreferences);
+router.post('/', Controller.createPreference);
+router.put('/:id', Controller.updatePreference);
+router.delete('/:id', Controller.deletePreference);
 
 export default router;
