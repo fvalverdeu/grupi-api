@@ -4,6 +4,9 @@ import User from "../models/user.model";
 import Contact from "../models/contact.model";
 import Place from "../models/place.model";
 import { EContactStatus } from "../constants/contact.enum";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
+
 
 export const getVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -106,15 +109,20 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
         if (!place) return res.status(400).json({ msg: 'El lugar no existe' });
 
         const newVisit = new Visit(req.body);
-        await newVisit.save();
-        // const number = await Visit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
-        console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace)
-        const totalVisits = await Visit.find({ idGrupi: req.body.idGrupi, idPlace: req.body.idPlace });
+        // await newVisit.save();
+        // const totalVisits = await Visit.collection.countDocuments({ idGrupi: idGrupi, idPlace: idPlace });
+        // console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace)
+        const totalVisits = await Visit.find({ idGrupi: idGrupi, idPlace: idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', totalVisits.length);
         if (totalVisits.length > 3) {
-            const index = user.places.findIndex((place: any) => place.id === newVisit.idPlace);
+            console.log(user.places);
+            const index = user.places.findIndex((placeItem: any) => placeItem._id.toString() === place._id.toString());
+            console.log('indice', index)
             if (index === -1) {
-                const placesUpdate = user.places.push(place);
+                const placesUpdate = [...user.places];
+                placesUpdate.push(place);
+                console.log(user);
+                // await user.save();
                 await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
             }
         }

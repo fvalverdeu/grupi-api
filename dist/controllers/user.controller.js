@@ -122,7 +122,7 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const yourFavoritePlaces = [];
         if (!idUser)
             return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
-        const user = yield user_model_1.default.findOne({ _id: idUser });
+        const user = yield user_model_1.default.findOne({ _id: idUser }).populate('places');
         if (!user)
             return res.status(500).json({ message: 'El usuario no existe.' + idUser });
         const sendList = yield contact_model_1.default.find({ idSender: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idReceptor');
@@ -151,15 +151,21 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             };
             yourPlaceList.push(place);
         });
-        user.places.forEach((item) => {
+        user.places.forEach((item) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            const index = places.findIndex(p => {
+                return p.idPlace._id.equals(item._id);
+            });
+            console.log(index);
+            console.log(places[index]);
             const place = {
                 id: item._id,
                 brandUrl: item.brandUrl,
-                name: item.idPlace.name,
-                visitDate: item.visitStart,
+                name: item.name,
+                visitDate: (_a = places[index]) === null || _a === void 0 ? void 0 : _a.visitStart,
             };
             yourFavoritePlaces.push(place);
-        });
+        }));
         const userData = {
             id: idUser,
             profile: user.profile,
@@ -170,6 +176,7 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         return res.status(200).json(userData);
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 });

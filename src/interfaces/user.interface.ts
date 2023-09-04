@@ -8,7 +8,8 @@ export interface IUser extends Document {
     code: string;
     status: string;
     profile: IProfile;
-    places: IPlace[];
+    // places: IPlace[];
+    places: any[];
     comparePassword: (password: string) => Promise<boolean>;
 }
 

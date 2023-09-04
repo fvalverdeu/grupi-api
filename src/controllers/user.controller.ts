@@ -106,7 +106,7 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
         const yourPlaceList: any[] = [];
         const yourFavoritePlaces: any[] = [];
         if (!idUser) return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
-        const user = await User.findOne({ _id: idUser });
+        const user = await User.findOne({ _id: idUser }).populate('places');
         if (!user) return res.status(500).json({ message: 'El usuario no existe.' + idUser });
 
         const sendList = await Contact.find({ idSender: idUser, status: EContactStatus.ACCEPT }).populate('idReceptor') as any[];
@@ -136,12 +136,19 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
             }
             yourPlaceList.push(place);
         });
-        user.places.forEach((item: any) => {
+
+
+        user.places.forEach(async (item: any) => {
+            const index = places.findIndex(p => {
+                return p.idPlace._id.equals(item._id)
+            });
+            console.log(index);
+            console.log(places[index]);
             const place = {
                 id: item._id,
                 brandUrl: item.brandUrl,
-                name: item.idPlace.name,
-                visitDate: item.visitStart,
+                name: item.name,
+                visitDate: places[index]?.visitStart,
             }
             yourFavoritePlaces.push(place);
         })
@@ -155,6 +162,7 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
         }
         return res.status(200).json(userData);
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 }

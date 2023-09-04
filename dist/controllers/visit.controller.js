@@ -18,6 +18,8 @@ const user_model_1 = __importDefault(require("../models/user.model"));
 const contact_model_1 = __importDefault(require("../models/contact.model"));
 const place_model_1 = __importDefault(require("../models/place.model"));
 const contact_enum_1 = require("../constants/contact.enum");
+const mongoose_1 = __importDefault(require("mongoose"));
+const ObjectId = mongoose_1.default.Types.ObjectId;
 const getVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const visit = yield visit_model_1.default.findOne({ _id: req.params.id });
@@ -125,15 +127,20 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!place)
             return res.status(400).json({ msg: 'El lugar no existe' });
         const newVisit = new visit_model_1.default(req.body);
-        yield newVisit.save();
-        // const number = await Visit.collection.countDocuments({ idGrupi: req.body.idGrupi, idplace: req.body.idPlace });
-        console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace);
-        const totalVisits = yield visit_model_1.default.find({ idGrupi: req.body.idGrupi, idPlace: req.body.idPlace });
+        // await newVisit.save();
+        // const totalVisits = await Visit.collection.countDocuments({ idGrupi: idGrupi, idPlace: idPlace });
+        // console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace)
+        const totalVisits = yield visit_model_1.default.find({ idGrupi: idGrupi, idPlace: idPlace });
         console.log('NUMBER VISITS :::::::::::::::::::: ', totalVisits.length);
         if (totalVisits.length > 3) {
-            const index = user.places.findIndex((place) => place.id === newVisit.idPlace);
+            console.log(user.places);
+            const index = user.places.findIndex((placeItem) => placeItem._id.toString() === place._id.toString());
+            console.log('indice', index);
             if (index === -1) {
-                const placesUpdate = user.places.push(place);
+                const placesUpdate = [...user.places];
+                placesUpdate.push(place);
+                console.log(user);
+                // await user.save();
                 yield user_model_1.default.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
             }
         }
