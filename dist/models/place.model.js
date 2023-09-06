@@ -10,5 +10,6 @@ const placeSchema = new mongoose_1.Schema({
     brandUrl: { type: String, required: true, default: '' },
     backgroundUrl: { type: String, required: true, default: '' },
     bannerUrls: [{ type: String }],
+    markerUrl: { type: String },
 });
 exports.default = (0, mongoose_1.model)('Place', placeSchema);

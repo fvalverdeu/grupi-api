@@ -10,6 +10,7 @@ const placeSchema = new Schema({
     brandUrl: { type: String, required: true, default: '' },
     backgroundUrl: { type: String, required: true, default: '' },
     bannerUrls: [{ type: String }],
+    markerUrl: { type: String },
 });
 
 export default model<IPlace>('Place', placeSchema);

@@ -7,6 +7,7 @@ export interface IPlace {
     brandUrl: string;
     backgroundUrl: string;
     bannerUrls: string[];
+    markerUrl: string;
 }
 
 export interface ICoordinate {
