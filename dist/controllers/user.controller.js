@@ -148,6 +148,7 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 brandUrl: item.idPlace.brandUrl,
                 name: item.idPlace.name,
                 visitDate: item.visitStart,
+                address: item.idPlace.address,
             };
             yourPlaceList.push(place);
         });
@@ -163,6 +164,7 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 brandUrl: item.brandUrl,
                 name: item.name,
                 visitDate: (_a = places[index]) === null || _a === void 0 ? void 0 : _a.visitStart,
+                address: item.address,
             };
             yourFavoritePlaces.push(place);
         }));

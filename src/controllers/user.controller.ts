@@ -133,6 +133,7 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
                 brandUrl: item.idPlace.brandUrl,
                 name: item.idPlace.name,
                 visitDate: item.visitStart,
+                address: item.idPlace.address,
             }
             yourPlaceList.push(place);
         });
@@ -149,6 +150,7 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
                 brandUrl: item.brandUrl,
                 name: item.name,
                 visitDate: places[index]?.visitStart,
+                address: item.address,
             }
             yourFavoritePlaces.push(place);
         })
