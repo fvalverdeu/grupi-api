@@ -103,12 +103,18 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
             var age_dt = new Date(diff_ms);
             totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
         });
-        data.totalGrupies = profiles.length;
-        data.femalePercent = Math.round((totalFemale / profiles.length) * 100);
-        data.malePercent = Math.round((totalMale / profiles.length) * 100);
-        data.notBinaryPercent = Math.round((totalNotBinary / profiles.length) * 100);
-        data.preferencesPercent = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
-        data.ageAverage = Math.round((totalAge / profiles.length));
+        const totalGrupiesData = profiles.length;
+        const femalePercentData = Math.round((totalFemale / profiles.length) * 100);
+        const malePercentData = Math.round((totalMale / profiles.length) * 100);
+        const notBinaryPercentData = Math.round((totalNotBinary / profiles.length) * 100);
+        const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
+        const ageAverageData = Math.round((totalAge / profiles.length));
+        data.totalGrupies = totalGrupiesData ? totalGrupiesData : 0;
+        data.femalePercent = femalePercentData ? femalePercentData : 0;
+        data.malePercent = malePercentData ? malePercentData : 0;
+        data.notBinaryPercent = notBinaryPercentData ? notBinaryPercentData : 0;
+        data.preferencesPercent = preferencesPercentData ? preferencesPercentData : 0;
+        data.ageAverage = ageAverageData ? ageAverageData : 0;
         return res.status(200).json(data);
     }
     catch (error) {
