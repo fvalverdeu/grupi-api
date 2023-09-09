@@ -116,7 +116,7 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
         if (!place) return res.status(400).json({ msg: 'El lugar no existe' });
 
         const newVisit = new Visit(req.body);
-        // await newVisit.save();
+        await newVisit.save();
         // const totalVisits = await Visit.collection.countDocuments({ idGrupi: idGrupi, idPlace: idPlace });
         // console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace)
         const totalVisits = await Visit.find({ idGrupi: idGrupi, idPlace: idPlace });

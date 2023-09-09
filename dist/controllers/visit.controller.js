@@ -133,7 +133,7 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         if (!place)
             return res.status(400).json({ msg: 'El lugar no existe' });
         const newVisit = new visit_model_1.default(req.body);
-        // await newVisit.save();
+        yield newVisit.save();
         // const totalVisits = await Visit.collection.countDocuments({ idGrupi: idGrupi, idPlace: idPlace });
         // console.log('idGrupi: ' + idGrupi + ' idPlace: ' + idPlace)
         const totalVisits = yield visit_model_1.default.find({ idGrupi: idGrupi, idPlace: idPlace });
