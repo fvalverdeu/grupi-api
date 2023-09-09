@@ -1,6 +1,6 @@
 export interface IVisit {
     _id: string;
-    idUser: string;
+    idGrupi: string;
     idPlace: string;
     visitStart: Date;
     visitEnd: Date;
