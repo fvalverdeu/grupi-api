@@ -72,6 +72,7 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
     try {
         const user = yield user_model_1.default.findOne({ _id: req.body.idUser });
         const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
+        console.log('VISITS :::::::::::::::::::: ', visits);
         let totalFemale = 0;
         let totalMale = 0;
         let totalNotBinary = 0;
@@ -101,6 +102,7 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
             }
             var diff_ms = Date.now() - profile.birthdate.getTime();
             var age_dt = new Date(diff_ms);
+            console.log('EDAD :::::::::::::::::: ', Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear()).toString());
             totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
         });
         const totalGrupiesData = profiles.length;

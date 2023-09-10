@@ -57,6 +57,7 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
     try {
         const user = await User.findOne({ _id: req.body.idUser });
         const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
+        console.log('VISITS :::::::::::::::::::: ', visits);
         let totalFemale = 0;
         let totalMale = 0;
         let totalNotBinary = 0;
@@ -85,6 +86,7 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
             }
             var diff_ms = Date.now() - profile.birthdate.getTime();
             var age_dt = new Date(diff_ms);
+            console.log('EDAD :::::::::::::::::: ', Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear()).toString());
             totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
         });
         const totalGrupiesData = profiles.length;

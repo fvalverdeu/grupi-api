@@ -129,8 +129,8 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const receptList = yield contact_model_1.default.find({ idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
         sendList.forEach(item => {
             const userContact = {
-                id: item.idReceptor._id,
-                name: item.idReceptor.profile.name,
+                id: item.idReceptor ? item.idReceptor._id : '',
+                name: item.idReceptor ? item.idReceptor.profile.name : '',
             };
             yourContactList.push(userContact);
         });
@@ -144,16 +144,15 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const places = yield visit_model_1.default.find({ idGrupi: idUser }).populate('idPlace');
         places.forEach(item => {
             const place = {
-                id: item.idPlace._id,
-                brandUrl: item.idPlace.brandUrl,
-                name: item.idPlace.name,
-                visitDate: item.visitStart,
-                address: item.idPlace.address,
+                id: item.idPlace ? item.idPlace._id : '',
+                brandUrl: item.idPlace ? item.idPlace.brandUrl : '',
+                name: item.idPlace ? item.idPlace.name : '',
+                visitDate: item ? item.visitStart : '',
+                address: item.idPlace ? item.idPlace.address : '',
             };
             yourPlaceList.push(place);
         });
         user.places.forEach((item) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a;
             const index = places.findIndex(p => {
                 return p.idPlace._id.equals(item._id);
             });
@@ -163,7 +162,7 @@ const getUserInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 id: item._id,
                 brandUrl: item.brandUrl,
                 name: item.name,
-                visitDate: (_a = places[index]) === null || _a === void 0 ? void 0 : _a.visitStart,
+                visitDate: places[index] ? places[index].visitStart : '',
                 address: item.address,
             };
             yourFavoritePlaces.push(place);

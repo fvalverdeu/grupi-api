@@ -113,8 +113,8 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
         const receptList = await Contact.find({ idReceptor: idUser, status: EContactStatus.ACCEPT }).populate('idSender') as any[];
         sendList.forEach(item => {
             const userContact = {
-                id: item.idReceptor._id,
-                name: item.idReceptor.profile.name,
+                id: item.idReceptor ? item.idReceptor._id : '',
+                name: item.idReceptor ? item.idReceptor.profile.name : '',
             }
             yourContactList.push(userContact);
         });
@@ -129,11 +129,11 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
         const places = await Visit.find({ idGrupi: idUser }).populate('idPlace') as any[];
         places.forEach(item => {
             const place = {
-                id: item.idPlace._id,
-                brandUrl: item.idPlace.brandUrl,
-                name: item.idPlace.name,
-                visitDate: item.visitStart,
-                address: item.idPlace.address,
+                id: item.idPlace ? item.idPlace._id : '',
+                brandUrl: item.idPlace ? item.idPlace.brandUrl : '',
+                name: item.idPlace ? item.idPlace.name : '',
+                visitDate: item ? item.visitStart : '',
+                address: item.idPlace ? item.idPlace.address : '',
             }
             yourPlaceList.push(place);
         });
@@ -149,7 +149,7 @@ export const getUserInfo = async (req: Request, res: Response): Promise<Response
                 id: item._id,
                 brandUrl: item.brandUrl,
                 name: item.name,
-                visitDate: places[index]?.visitStart,
+                visitDate: places[index] ? places[index].visitStart : '',
                 address: item.address,
             }
             yourFavoritePlaces.push(place);
