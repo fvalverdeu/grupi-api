@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteVisit = exports.updateVisit = exports.createVisit = exports.getVisitsStatisticsByPlaceId = exports.getVisitsByPlaceId = exports.getVisits = exports.getVisit = void 0;
+exports.checkIfVisitNow = exports.checkOut = exports.deleteVisit = exports.updateVisit = exports.createVisit = exports.getVisitsStatisticsByPlaceId = exports.getVisitsByPlaceId = exports.getVisits = exports.getVisit = void 0;
 const visit_model_1 = __importDefault(require("../models/visit.model"));
 const user_model_1 = __importDefault(require("../models/user.model"));
 const contact_model_1 = __importDefault(require("../models/contact.model"));
 const place_model_1 = __importDefault(require("../models/place.model"));
 const contact_enum_1 = require("../constants/contact.enum");
 const mongoose_1 = __importDefault(require("mongoose"));
+const visit_enum_1 = require("../constants/visit.enum");
 const ObjectId = mongoose_1.default.Types.ObjectId;
 const getVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -49,7 +50,7 @@ const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
-        const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi');
+        const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: searchTerm, idGrupi: { $ne: req.body.idUser } }).populate('idGrupi');
         const contacts = yield contact_model_1.default.find({ $or: [{ idSender: idUser, status: contact_enum_1.EContactStatus.ACCEPT }, { idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }] });
         const list = visits.map(item => {
             const grupi = {
@@ -70,9 +71,16 @@ const getVisitsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.getVisitsByPlaceId = getVisitsByPlaceId;
 const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { idUser } = req.body;
+        const idPlace = req.params.id;
         const user = yield user_model_1.default.findOne({ _id: req.body.idUser });
-        const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
-        console.log('VISITS :::::::::::::::::::: ', visits);
+        if (!user)
+            return res.status(400).json({ msg: 'El usuario no existe' });
+        const place = yield place_model_1.default.findOne({ _id: idPlace });
+        if (!place) {
+            return res.status(400).json({ msg: 'El lugar no existe' });
+        }
+        const visits = yield visit_model_1.default.find({ idPlace: req.params.id, status: 'ACTIVE', idGrupi: { $ne: req.body.idUser } }).populate('idGrupi');
         let totalFemale = 0;
         let totalMale = 0;
         let totalNotBinary = 0;
@@ -86,7 +94,6 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
             totalGrupies: 0,
             ageAverage: 0,
         };
-        const currentDate = new Date();
         const listCommonPreferences = [];
         let profiles = visits.map((item) => item.idGrupi.profile);
         profiles.forEach(profile => {
@@ -102,14 +109,15 @@ const getVisitsStatisticsByPlaceId = (req, res) => __awaiter(void 0, void 0, voi
             }
             var diff_ms = Date.now() - profile.birthdate.getTime();
             var age_dt = new Date(diff_ms);
-            console.log('EDAD :::::::::::::::::: ', Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear()).toString());
-            totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
+            const ageUser = Math.abs(age_dt.getUTCFullYear() - 1970);
+            totalAge = totalAge + Math.abs(ageUser);
         });
         const totalGrupiesData = profiles.length;
         const femalePercentData = Math.round((totalFemale / profiles.length) * 100);
         const malePercentData = Math.round((totalMale / profiles.length) * 100);
         const notBinaryPercentData = Math.round((totalNotBinary / profiles.length) * 100);
-        const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
+        // const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
+        const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / user.profile.preferenceList.length) * 100) : 0;
         const ageAverageData = Math.round((totalAge / profiles.length));
         data.totalGrupies = totalGrupiesData ? totalGrupiesData : 0;
         data.femalePercent = femalePercentData ? femalePercentData : 0;
@@ -128,12 +136,19 @@ exports.getVisitsStatisticsByPlaceId = getVisitsStatisticsByPlaceId;
 const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { idGrupi, idPlace } = req.body;
+        if (!idGrupi)
+            return res.status(500).json({ message: 'Ingrese un ID Grupi' });
+        if (!idPlace)
+            return res.status(500).json({ message: 'Ingrese un ID Place' });
         const user = yield user_model_1.default.findOne({ _id: idGrupi });
         if (!user)
             return res.status(400).json({ msg: 'El usuario no existe' });
         const place = yield place_model_1.default.findOne({ _id: idPlace });
         if (!place)
             return res.status(400).json({ msg: 'El lugar no existe' });
+        const activeVisits = yield visit_model_1.default.find({ idGrupi: idGrupi, idPlace: idPlace, status: visit_enum_1.EVisitStatus.ACTIVE });
+        if (activeVisits.length > 0)
+            return res.status(400).json({ msg: 'Usted ya está conectado en otro establecimiento.' });
         const newVisit = new visit_model_1.default(req.body);
         yield newVisit.save();
         // const totalVisits = await Visit.collection.countDocuments({ idGrupi: idGrupi, idPlace: idPlace });
@@ -152,7 +167,14 @@ const createVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 yield user_model_1.default.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
             }
         }
-        return res.status(200).json({ data: newVisit });
+        const dataNewVisit = {
+            _id: newVisit._id,
+            idGrupi, idPlace,
+            visitStart: newVisit.visitStart,
+            status: newVisit.status,
+            coords: place.coords,
+        };
+        return res.status(200).json(dataNewVisit);
     }
     catch (error) {
         console.log(error);
@@ -166,7 +188,7 @@ const updateVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const visit = req.body;
         const visitUpdated = yield visit_model_1.default.findOneAndUpdate({ _id: id }, visit, { new: true });
         if (visitUpdated)
-            return res.status(200).json(visit);
+            return res.status(200).json(visitUpdated);
         else
             return res.status(200).json({ message: 'No se encuentra el elemento.' });
     }
@@ -186,6 +208,51 @@ const deleteVisit = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.deleteVisit = deleteVisit;
+const checkOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const visitUpdated = yield visit_model_1.default.findOneAndUpdate({ _id: id }, { visitEnd: new Date(), status: visit_enum_1.EVisitStatus.INACTIVE }, { new: true });
+        if (visitUpdated)
+            return res.status(200).json(visitUpdated);
+        else
+            return res.status(200).json({ message: 'No se encuentra el elemento.' });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Error en el servidor' });
+    }
+});
+exports.checkOut = checkOut;
+const checkIfVisitNow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const idGrupi = req.params.id;
+        if (!idGrupi)
+            return res.status(500).json({ message: 'Debe enviar idGrupi' });
+        const visits = yield visit_model_1.default.find({ idGrupi: idGrupi, status: visit_enum_1.EVisitStatus.ACTIVE });
+        console.log('VISITS: ', visits);
+        if (visits.length > 0) {
+            const place = yield place_model_1.default.findOne({ _id: visits[0].idPlace });
+            if (!place)
+                return res.status(400).json({ msg: 'El lugar no existe' });
+            const dataVisit = {
+                _id: visits[0]._id,
+                idGrupi,
+                idPlace: visits[0].idPlace,
+                visitStart: visits[0].visitStart,
+                status: visits[0].status,
+                coords: place.coords,
+            };
+            return res.status(200).json([dataVisit]);
+        }
+        else {
+            return res.status(200).json([]);
+        }
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+});
+exports.checkIfVisitNow = checkIfVisitNow;
 exports.default = {
     getVisit: exports.getVisit,
     getVisits: exports.getVisits,
@@ -194,4 +261,6 @@ exports.default = {
     deleteVisit: exports.deleteVisit,
     getVisitsByPlaceId: exports.getVisitsByPlaceId,
     getVisitsStatisticsByPlaceId: exports.getVisitsStatisticsByPlaceId,
+    checkOut: exports.checkOut,
+    checkIfVisitNow: exports.checkIfVisitNow,
 };

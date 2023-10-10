@@ -7,7 +7,7 @@ import { EUserStatus } from "../constants/user.enum";
 const userSchema = new Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },
     password: { type: String, required: true },
-    code: { type: String, required: true, default: '' },
+    code: { type: String, required: false, default: '' },
     status: { type: String, required: true, default: EUserStatus.UNVERIFIED },
     profile: {
         name: { type: String },

@@ -17,9 +17,9 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
             return res.status(400).json({ msg: 'El usuario ya existe.' });
         }
         const newUser = new User(req.body);
-        newUser.code = generateCode();
+        // newUser.code = generateCode();
         await newUser.save();
-        await sendMail(newUser.email, newUser.code.toString());
+        // await sendMail(newUser.email, newUser.code.toString());
         return res.status(201).json({ newUser, token: createToken(newUser) });
     } catch (error) {
         console.log(error);

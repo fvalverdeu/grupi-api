@@ -107,8 +107,33 @@ export const deleteContact = async (req: Request, res: Response): Promise<Respon
 
 export const getContactsOfUser = async (req: Request, res: Response): Promise<Response> => {
     try {
+        const yourContactList: any[] = [];
+        const idUser = req.params.id;
+        if (!idUser) return res.status(500).json({ message: 'Ingrese un ID Grupi' });
         const contacts = await Contact.find({ $or: [{ idSender: req.params.id, status: EContactStatus.ACCEPT }, { idReceptor: req.params.id, status: EContactStatus.ACCEPT }] });
-        return res.status(200).json(contacts);
+
+
+        const sendList = await Contact.find({ idSender: idUser, status: EContactStatus.ACCEPT }).populate('idSender') as any[];
+        const receptList = await Contact.find({ idReceptor: idUser, status: EContactStatus.ACCEPT }).populate('idReceptor') as any[];
+        sendList.forEach(item => {
+            const contact = {
+                id: item.idSender._id,
+                name: item.idSender.profile.name,
+                date: item.createdAt,
+                urlImage: item.idSender.profile.imageUrl
+            }
+            yourContactList.push(contact);
+        });
+        receptList.forEach(item => {
+            const contact = {
+                id: item.idReceptor._id,
+                name: item.idReceptor.profile.name,
+                date: item.createdAt,
+                urlImage: item.idReceptor.profile.imageUrl
+            }
+            yourContactList.push(contact);
+        });
+        return res.status(200).json(yourContactList);
     } catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });
     }

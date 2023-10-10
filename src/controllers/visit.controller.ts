@@ -5,6 +5,7 @@ import Contact from "../models/contact.model";
 import Place from "../models/place.model";
 import { EContactStatus } from "../constants/contact.enum";
 import mongoose from "mongoose";
+import { EVisitStatus } from "../constants/visit.enum";
 const ObjectId = mongoose.Types.ObjectId;
 
 
@@ -35,7 +36,7 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
-        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi') as any[];
+        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm, idGrupi: { $ne: req.body.idUser } }).populate('idGrupi') as any[];
         const contacts = await Contact.find({ $or: [{ idSender: idUser, status: EContactStatus.ACCEPT }, { idReceptor: idUser, status: EContactStatus.ACCEPT }] });
         const list = visits.map(item => {
             const grupi = {
@@ -55,9 +56,17 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
 
 export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response): Promise<Response> => {
     try {
+        const { idUser } = req.body;
+        const idPlace = req.params.id;
+
         const user = await User.findOne({ _id: req.body.idUser });
-        const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
-        console.log('VISITS :::::::::::::::::::: ', visits);
+        if (!user) return res.status(400).json({ msg: 'El usuario no existe' });
+
+        const place = await Place.findOne({ _id: idPlace });
+        if (!place) {
+            return res.status(400).json({ msg: 'El lugar no existe' });
+        }
+        const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE', idGrupi: { $ne: req.body.idUser } }).populate('idGrupi');
         let totalFemale = 0;
         let totalMale = 0;
         let totalNotBinary = 0;
@@ -71,7 +80,6 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
             totalGrupies: 0,
             ageAverage: 0,
         }
-        const currentDate = new Date();
         const listCommonPreferences: any[] = [];
         let profiles: any[] = visits.map((item: any) => item.idGrupi.profile);
         profiles.forEach(profile => {
@@ -86,14 +94,15 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
             }
             var diff_ms = Date.now() - profile.birthdate.getTime();
             var age_dt = new Date(diff_ms);
-            console.log('EDAD :::::::::::::::::: ', Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear()).toString());
-            totalAge = totalAge + Math.abs(age_dt.getUTCFullYear() - currentDate.getFullYear());
+            const ageUser = Math.abs(age_dt.getUTCFullYear() - 1970);
+            totalAge = totalAge + Math.abs(ageUser);
         });
         const totalGrupiesData = profiles.length;
         const femalePercentData = Math.round((totalFemale / profiles.length) * 100);
         const malePercentData = Math.round((totalMale / profiles.length) * 100);
         const notBinaryPercentData = Math.round((totalNotBinary / profiles.length) * 100);
-        const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
+        // const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
+        const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / user.profile.preferenceList.length) * 100) : 0;
         const ageAverageData = Math.round((totalAge / profiles.length));
 
         data.totalGrupies = totalGrupiesData ? totalGrupiesData : 0;
@@ -112,10 +121,14 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
 export const createVisit = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { idGrupi, idPlace } = req.body;
+        if (!idGrupi) return res.status(500).json({ message: 'Ingrese un ID Grupi' });
+        if (!idPlace) return res.status(500).json({ message: 'Ingrese un ID Place' });
         const user = await User.findOne({ _id: idGrupi });
         if (!user) return res.status(400).json({ msg: 'El usuario no existe' });
         const place = await Place.findOne({ _id: idPlace });
         if (!place) return res.status(400).json({ msg: 'El lugar no existe' });
+        const activeVisits = await Visit.find({ idGrupi: idGrupi, idPlace: idPlace, status: EVisitStatus.ACTIVE });
+        if (activeVisits.length > 0) return res.status(400).json({ msg: 'Usted ya está conectado en otro establecimiento.' });
 
         const newVisit = new Visit(req.body);
         await newVisit.save();
@@ -135,7 +148,14 @@ export const createVisit = async (req: Request, res: Response): Promise<Response
                 await User.findOneAndUpdate({ _id: idGrupi }, { places: placesUpdate });
             }
         }
-        return res.status(200).json({ data: newVisit });
+        const dataNewVisit = {
+            _id: newVisit._id,
+            idGrupi, idPlace,
+            visitStart: newVisit.visitStart,
+            status: newVisit.status,
+            coords: place.coords,
+        }
+        return res.status(200).json(dataNewVisit);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
@@ -147,7 +167,7 @@ export const updateVisit = async (req: Request, res: Response): Promise<Response
         const { id } = req.params;
         const visit = req.body;
         const visitUpdated = await Visit.findOneAndUpdate({ _id: id }, visit, { new: true });
-        if (visitUpdated) return res.status(200).json(visit);
+        if (visitUpdated) return res.status(200).json(visitUpdated);
         else return res.status(200).json({ message: 'No se encuentra el elemento.' });
     } catch (error) {
         return res.status(500).json({ message: 'Error en el servidor' });
@@ -164,6 +184,46 @@ export const deleteVisit = async (req: Request, res: Response): Promise<Response
     }
 }
 
+export const checkOut = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { id } = req.params;
+        const visitUpdated = await Visit.findOneAndUpdate({ _id: id }, { visitEnd: new Date(), status: EVisitStatus.INACTIVE }, { new: true });
+        if (visitUpdated) return res.status(200).json(visitUpdated);
+        else return res.status(200).json({ message: 'No se encuentra el elemento.' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error en el servidor' });
+    }
+}
+
+export const checkIfVisitNow = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const idGrupi = req.params.id;
+        if (!idGrupi) return res.status(500).json({ message: 'Debe enviar idGrupi' });
+        const visits = await Visit.find({ idGrupi: idGrupi, status: EVisitStatus.ACTIVE });
+        console.log('VISITS: ', visits);
+        if (visits.length > 0) {
+            const place = await Place.findOne({ _id: visits[0].idPlace });
+            if (!place) return res.status(400).json({ msg: 'El lugar no existe' });
+            const dataVisit = {
+                _id: visits[0]._id,
+                idGrupi,
+                idPlace: visits[0].idPlace,
+                visitStart: visits[0].visitStart,
+                status: visits[0].status,
+                coords: place.coords,
+            }
+            return res.status(200).json([dataVisit]);
+        } else {
+            return res.status(200).json([]);
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Error en servidor' });
+    }
+}
+
+
 export default {
     getVisit,
     getVisits,
@@ -172,4 +232,6 @@ export default {
     deleteVisit,
     getVisitsByPlaceId,
     getVisitsStatisticsByPlaceId,
+    checkOut,
+    checkIfVisitNow,
 }

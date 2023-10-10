@@ -5,7 +5,7 @@ const visit_enum_1 = require("../constants/visit.enum");
 const visitSchema = new mongoose_1.Schema({
     idGrupi: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true },
     idPlace: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Place', required: true },
-    visitStart: { type: Date, required: true, default: new Date() },
+    visitStart: { type: Date, required: true, default: Date.now },
     visitEnd: { type: Date, required: false },
     status: { type: String, default: visit_enum_1.EVisitStatus.ACTIVE },
 });

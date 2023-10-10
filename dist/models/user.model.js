@@ -18,7 +18,7 @@ const user_enum_1 = require("../constants/user.enum");
 const userSchema = new mongoose_1.Schema({
     email: { type: String, unique: true, required: true, lowercase: true, trim: true },
     password: { type: String, required: true },
-    code: { type: String, required: true, default: '' },
+    code: { type: String, required: false, default: '' },
     status: { type: String, required: true, default: user_enum_1.EUserStatus.UNVERIFIED },
     profile: {
         name: { type: String },
