@@ -133,15 +133,16 @@ const getContactsOfUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const idUser = req.params.id;
         if (!idUser)
             return res.status(500).json({ message: 'Ingrese un ID Grupi' });
-        const contacts = yield contact_model_1.default.find({ $or: [{ idSender: req.params.id, status: contact_enum_1.EContactStatus.ACCEPT }, { idReceptor: req.params.id, status: contact_enum_1.EContactStatus.ACCEPT }] });
-        const sendList = yield contact_model_1.default.find({ idSender: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
-        const receptList = yield contact_model_1.default.find({ idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idReceptor');
+        // const contacts = await Contact.find({ $or: [{ idSender: req.params.id, status: EContactStatus.ACCEPT }, { idReceptor: req.params.id, status: EContactStatus.ACCEPT }] });
+        const sendList = yield contact_model_1.default.find({ idSender: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idReceptor');
+        const receptList = yield contact_model_1.default.find({ idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
         sendList.forEach(item => {
             const contact = {
                 id: item.idSender._id,
                 name: item.idSender.profile.name,
                 date: item.createdAt,
-                urlImage: item.idSender.profile.imageUrl
+                urlImage: item.idSender.profile.imageUrl,
+                description: 'Disponible',
             };
             yourContactList.push(contact);
         });
@@ -150,7 +151,8 @@ const getContactsOfUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 id: item.idReceptor._id,
                 name: item.idReceptor.profile.name,
                 date: item.createdAt,
-                urlImage: item.idReceptor.profile.imageUrl
+                urlImage: item.idReceptor.profile.imageUrl,
+                description: 'Disponible',
             };
             yourContactList.push(contact);
         });
@@ -163,8 +165,22 @@ const getContactsOfUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.getContactsOfUser = getContactsOfUser;
 const getRequestsRecived = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const contacts = yield contact_model_1.default.find({ $or: [{ idReceptor: req.params.id }] });
-        return res.status(200).json(contacts);
+        const yourContactList = [];
+        const idUser = req.params.id;
+        if (!idUser)
+            return res.status(500).json({ message: 'Ingrese un ID Grupi' });
+        const receptList = yield contact_model_1.default.find({ idReceptor: idUser, status: contact_enum_1.EContactStatus.ACCEPT }).populate('idSender');
+        receptList.forEach(item => {
+            const contact = {
+                id: item.idReceptor._id,
+                name: item.idReceptor.profile.name,
+                date: item.createdAt,
+                urlImage: item.idReceptor.profile.imageUrl,
+                description: 'Disponible',
+            };
+            yourContactList.push(contact);
+        });
+        return res.status(200).json(yourContactList);
     }
     catch (error) {
         return res.status(500).json({ message: 'Error en servidor' });
