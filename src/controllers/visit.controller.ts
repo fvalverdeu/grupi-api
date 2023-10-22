@@ -36,7 +36,8 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
-        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm, idGrupi: { $ne: req.body.idUser } }).populate('idGrupi') as any[];
+        // const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm, idGrupi: { $ne: req.body.idUser } }).populate('idGrupi') as any[];
+        const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi') as any[];
         const contacts = await Contact.find({ $or: [{ idSender: idUser, status: EContactStatus.ACCEPT }, { idReceptor: idUser, status: EContactStatus.ACCEPT }] });
         const list = visits.map(item => {
             const grupi = {
@@ -66,21 +67,25 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
-        const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE', idGrupi: { $ne: req.body.idUser } }).populate('idGrupi');
+        // const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE', idGrupi: { $ne: req.body.idUser } }).populate('idGrupi');
+        const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
         let totalFemale = 0;
         let totalMale = 0;
         let totalNotBinary = 0;
         let totalPreferences = 0;
+        let totalProfessionalPreferences = 0;
         let totalAge = 0;
         const data = {
             femalePercent: 0,
             malePercent: 0,
             notBinaryPercent: 0,
             preferencesPercent: 0,
+            professionalPercent: 0,
             totalGrupies: 0,
             ageAverage: 0,
         }
         const listCommonPreferences: any[] = [];
+        const listCommonProfessionalPreferences: any[] = [];
         let profiles: any[] = visits.map((item: any) => item.idGrupi.profile);
         profiles.forEach(profile => {
             profile.gender === 0 ? ++totalFemale : (profile.gender === 1 ? ++totalMale : ++totalNotBinary);
@@ -89,6 +94,13 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
                     if (profile.preferenceList.includes(preference)) {
                         ++totalPreferences;
                         if (!listCommonPreferences.includes(preference)) listCommonPreferences.push(preference);
+                    }
+                });
+
+                user.profile.professionalList.forEach(preference => {
+                    if (profile.professionalList.includes(preference)) {
+                        ++totalProfessionalPreferences;
+                        if (!listCommonProfessionalPreferences.includes(preference)) listCommonProfessionalPreferences.push(preference);
                     }
                 });
             }
@@ -103,6 +115,7 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
         const notBinaryPercentData = Math.round((totalNotBinary / profiles.length) * 100);
         // const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / totalPreferences) * 100) : 0;
         const preferencesPercentData = user != null ? Math.round((listCommonPreferences.length / user.profile.preferenceList.length) * 100) : 0;
+        const professionalPreferencesPercentData = user != null ? Math.round((listCommonProfessionalPreferences.length / user.profile.professionalList.length) * 100) : 0;
         const ageAverageData = Math.round((totalAge / profiles.length));
 
         data.totalGrupies = totalGrupiesData ? totalGrupiesData : 0;
@@ -110,6 +123,7 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
         data.malePercent = malePercentData ? malePercentData : 0;
         data.notBinaryPercent = notBinaryPercentData ? notBinaryPercentData : 0;
         data.preferencesPercent = preferencesPercentData ? preferencesPercentData : 0;
+        data.professionalPercent = professionalPreferencesPercentData ? professionalPreferencesPercentData : 0;
         data.ageAverage = ageAverageData ? ageAverageData : 0;
         return res.status(200).json(data);
     } catch (error) {

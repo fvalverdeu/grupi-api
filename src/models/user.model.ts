@@ -17,6 +17,7 @@ const userSchema = new Schema({
         gender: { type: Number },
         imageUrl: { type: String },
         preferenceList: [{ type: String }],
+        professionalList: [{ type: String }],
     },
     places: [{ type: Schema.Types.ObjectId, ref: 'Place' }],
 });

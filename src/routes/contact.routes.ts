@@ -13,5 +13,7 @@ router.put('/:id', Controller.updateContact);
 router.delete('/:id', authValidate, Controller.deleteContact);
 router.get('/user/:id', authValidate, Controller.getContactsOfUser);
 router.get('/recived/user/:id', authValidate, Controller.getRequestsRecived);
+router.post('/:id/accept', authValidate, Controller.acceptRequestsRecived);
+router.post('/:id/decline', authValidate, Controller.declineRequestsRecived);
 
 export default router;

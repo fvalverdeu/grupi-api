@@ -28,6 +28,7 @@ const userSchema = new mongoose_1.Schema({
         gender: { type: Number },
         imageUrl: { type: String },
         preferenceList: [{ type: String }],
+        professionalList: [{ type: String }],
     },
     places: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Place' }],
 });

@@ -15,4 +15,6 @@ router.put('/:id', contact_controller_1.default.updateContact);
 router.delete('/:id', authValidate, contact_controller_1.default.deleteContact);
 router.get('/user/:id', authValidate, contact_controller_1.default.getContactsOfUser);
 router.get('/recived/user/:id', authValidate, contact_controller_1.default.getRequestsRecived);
+router.post('/:id/accept', authValidate, contact_controller_1.default.acceptRequestsRecived);
+router.post('/:id/decline', authValidate, contact_controller_1.default.declineRequestsRecived);
 exports.default = router;

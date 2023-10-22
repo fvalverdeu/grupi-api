@@ -21,4 +21,5 @@ export interface IProfile {
     gender: number;
     imageUrl: string;
     preferenceList: IPreference[];
+    professionalList: IPreference[];
 }
