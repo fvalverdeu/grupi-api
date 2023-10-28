@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import path from 'path';
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
@@ -28,11 +29,13 @@ app.use(express.json());
 app.use(passport.initialize());
 passport.use(passportMiddleware);
 
+const publicPath = path.resolve(__dirname, 'public');
+app.use(express.static(publicPath));
 
 // routes
-app.get('/', (req, res) => {
-    res.send(`THE API is at http://localhost:${app.get('port')}`);
-});
+// app.get('/', (req, res) => {
+//     res.send(`THE API is at http://localhost:${app.get('port')}`);
+// });
 
 app.use('/assets', express.static('dist/assets'));
 app.use('/api/auth', authRoutes);
