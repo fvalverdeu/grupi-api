@@ -25,9 +25,11 @@ export const getNotificationsByUser = async (req: Request, res: Response): Promi
     try {
         const idGrupi = req.params.idGrupi;
         if (!idGrupi) return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
-        const notifications = await Notification.find({ idGrupi: idGrupi }).populate('idGrupi') as any[];
+        // const notifications = await Notification.find({ idGrupi: idGrupi }).populate('idGrupi') as any[];
+        const notifications = await Notification.find({ idGrupi: idGrupi });
         return res.status(200).json(notifications);
     } catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 }

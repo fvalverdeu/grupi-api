@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import User from "../models/user.model";
-import jwt from 'jsonwebtoken';
+import jwt, { decode } from 'jsonwebtoken';
 import config from '../config/config';
 import { sendMail } from "../config/mail.config";
 import { IUser } from "../interfaces/user.interface";
 import { EUserStatus } from "../constants/user.enum";
 import bcrypt from 'bcrypt';
+import { EJwtError } from "../constants/auth.enum";
 
 export const signUp = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -126,7 +127,39 @@ export const recoverPassword = async (req: Request, res: Response): Promise<Resp
         console.log(error);
         return res.status(400).json({ msg: 'Error al actualizar contraseña.' });
     }
+}
 
+export const refreshToken = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const authToken = req.headers['authorization'];
+        console.log('TOKEN ::::::::::::::', authToken);
+        if (!authToken) {
+            return res.status(400).json({ msg: 'Solicitud no permitida' });
+        }
+        const token = authToken.replace('Bearer ', '');
+        let idUser = '';
+        jwt.verify(token, config.jwtSecret, function (err: any, decoded: any) {
+            if (err) {
+                console.log('VERIFY ERROR :::::::::::::::', err.name);
+                // return res.status(400).json({ msg: 'Debe iniciar sesión nuevamente.' });
+            }
+            if (decoded) {
+                console.log('DECODED :::::::::::: ', decoded);
+                idUser = decoded.id;
+            }
+        });
+        if (idUser.length === 0) {
+            return res.status(400).json({ msg: 'Debe iniciar sesión nuevamente.' });
+        }
+        const user = await User.findOne({ _id: idUser });
+        if (!user) {
+            return res.status(400).json({ msg: 'El usuario no existe.' });
+        }
+        return res.status(200).json({ token: createToken(user) });
+    } catch (error) {
+        console.log('ERROR ::::::::::::', error);
+        return res.status(400).json({ msg: 'No es posible validar en este momento.' });
+    }
 }
 
 
@@ -136,4 +169,5 @@ export default {
     confirmEmail,
     sendCode,
     recoverPassword,
+    refreshToken,
 }

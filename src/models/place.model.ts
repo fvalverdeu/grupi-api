@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import { IPlace, ICoordinate } from "../interfaces/place.interface";
 
 const placeSchema = new Schema({
-    name: { type: String, unique: true, required: true, trim: true },
+    name: { type: String, required: true },
     address: { type: String, required: true },
     description: { type: String, required: true, default: '' },
     coords: { latitude: { type: String }, longitude: { type: String } },

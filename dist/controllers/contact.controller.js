@@ -219,16 +219,13 @@ exports.getRequestsRecived = getRequestsRecived;
 const acceptRequestsRecived = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = req.params.id;
-        console.log(id);
         if (!id)
             return res.status(500).json({ message: 'Debe enviar el id de la solicitud como parámetro.' });
         const contact = yield contact_model_1.default.findOne({ _id: id });
-        console.log(contact);
         if (!contact) {
             return res.status(400).json({ msg: 'La solicitud no existe' });
         }
         const contactUpdated = yield contact_model_1.default.findOneAndUpdate({ _id: id }, { status: contact_enum_1.EContactStatus.ACCEPT }, { new: true });
-        console.log(contactUpdated);
         const receptor = yield user_model_1.default.findOne({ _id: contact.idReceptor });
         const objNotification = {
             idGrupi: contact.idSender,
@@ -238,7 +235,6 @@ const acceptRequestsRecived = (req, res) => __awaiter(void 0, void 0, void 0, fu
             status: notification_1.ENotificationStatus.ACTIVE
         };
         const newNotification = new notification_model_1.default(objNotification);
-        console.log(newNotification);
         yield newNotification.save();
         return res.status(200).json({ confirm: true });
     }

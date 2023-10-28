@@ -32,12 +32,16 @@ export const getVisitsByPlaceId = async (req: Request, res: Response): Promise<R
         const idPlace = req.params.id;
         const idUser = req.body.idUser;
         const searchTerm = req.query.status;
+        console.log(idPlace);
         const place = await Place.findOne({ _id: idPlace });
+        console.log(idUser);
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
         // const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm, idGrupi: { $ne: req.body.idUser } }).populate('idGrupi') as any[];
+        console.log(place)
         const visits = await Visit.find({ idPlace: req.params.id, status: searchTerm }).populate('idGrupi') as any[];
+        console.log(visits)
         const contacts = await Contact.find({ $or: [{ idSender: idUser, status: EContactStatus.ACCEPT }, { idReceptor: idUser, status: EContactStatus.ACCEPT }] });
         const list = visits.map(item => {
             const grupi = {
@@ -60,15 +64,21 @@ export const getVisitsStatisticsByPlaceId = async (req: Request, res: Response):
         const { idUser } = req.body;
         const idPlace = req.params.id;
 
+        console.log(idUser);
         const user = await User.findOne({ _id: req.body.idUser });
+        console.log(idPlace);
         if (!user) return res.status(400).json({ msg: 'El usuario no existe' });
 
+        console.log('prev');
         const place = await Place.findOne({ _id: idPlace });
+        console.log('after');
         if (!place) {
             return res.status(400).json({ msg: 'El lugar no existe' });
         }
         // const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE', idGrupi: { $ne: req.body.idUser } }).populate('idGrupi');
+        console.log(user);
         const visits: any = await Visit.find({ idPlace: req.params.id, status: 'ACTIVE' }).populate('idGrupi');
+        console.log(place);
         let totalFemale = 0;
         let totalMale = 0;
         let totalNotBinary = 0;

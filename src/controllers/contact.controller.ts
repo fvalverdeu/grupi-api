@@ -193,16 +193,13 @@ export const getRequestsRecived = async (req: Request, res: Response): Promise<R
 export const acceptRequestsRecived = async (req: Request, res: Response): Promise<Response> => {
     try {
         const id = req.params.id;
-        console.log(id);
 
         if (!id) return res.status(500).json({ message: 'Debe enviar el id de la solicitud como parámetro.' });
         const contact = await Contact.findOne({ _id: id });
-        console.log(contact);
         if (!contact) {
             return res.status(400).json({ msg: 'La solicitud no existe' });
         }
         const contactUpdated = await Contact.findOneAndUpdate({ _id: id }, { status: EContactStatus.ACCEPT }, { new: true });
-        console.log(contactUpdated);
         const receptor = await User.findOne({ _id: contact.idReceptor });
         const objNotification: INotification = {
             idGrupi: contact.idSender,
@@ -212,7 +209,6 @@ export const acceptRequestsRecived = async (req: Request, res: Response): Promis
             status: ENotificationStatus.ACTIVE
         };
         const newNotification = new Notification(objNotification);
-        console.log(newNotification);
         await newNotification.save();
         return res.status(200).json({ confirm: true });
     } catch (error) {

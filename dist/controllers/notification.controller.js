@@ -42,10 +42,12 @@ const getNotificationsByUser = (req, res) => __awaiter(void 0, void 0, void 0, f
         const idGrupi = req.params.idGrupi;
         if (!idGrupi)
             return res.status(500).json({ message: 'Debe proporcionar un id de usuario.' });
-        const notifications = yield notification_model_1.default.find({ idGrupi: idGrupi }).populate('idGrupi');
+        // const notifications = await Notification.find({ idGrupi: idGrupi }).populate('idGrupi') as any[];
+        const notifications = yield notification_model_1.default.find({ idGrupi: idGrupi });
         return res.status(200).json(notifications);
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json({ message: 'Error en servidor' });
     }
 });
