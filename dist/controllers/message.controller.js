@@ -23,7 +23,10 @@ const getChatHistorial = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (!idTo)
             return res.status(500).json({ message: 'Debe proporcionar un id de usuario receptor.' });
         // const messages = await Message.find({ idGrupi: idGrupi }).populate('idGrupi') as any[];
-        const messages = yield message_model_1.default.find({ idFrom: idFrom, idTo: idTo });
+        const messages = yield message_model_1.default.find({
+            $or: [{ idFrom: idFrom, idTo: idTo }, { idFrom: idTo, idTo: idFrom }]
+        })
+            .sort({ createdAt: 'desc' });
         return res.status(200).json(messages);
     }
     catch (error) {
@@ -38,8 +41,10 @@ const createMessage = (payload) => __awaiter(void 0, void 0, void 0, function* (
             return;
         if (!payload.idTo)
             return;
+        console.log('CREATE MESSAGE PAYLOAD ::::::::::::::::: ', payload);
         const newMessage = new message_model_1.default(payload);
         const message = yield newMessage.save();
+        console.log('CREATE MESSAGE MESSAGE SAVED ::::::::::::::::: ', message);
         return message;
     }
     catch (error) {

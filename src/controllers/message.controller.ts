@@ -8,7 +8,10 @@ export const getChatHistorial = async (req: Request, res: Response): Promise<Res
         if (!idFrom) return res.status(500).json({ message: 'Debe proporcionar un id de usuario emisor.' });
         if (!idTo) return res.status(500).json({ message: 'Debe proporcionar un id de usuario receptor.' });
         // const messages = await Message.find({ idGrupi: idGrupi }).populate('idGrupi') as any[];
-        const messages = await Message.find({ idFrom: idFrom, idTo: idTo });
+        const messages = await Message.find({
+            $or: [{ idFrom: idFrom, idTo: idTo }, { idFrom: idTo, idTo: idFrom }]
+        })
+            .sort({ createdAt: 'desc' });
         return res.status(200).json(messages);
     } catch (error) {
         console.log(error);
@@ -20,8 +23,10 @@ export const createMessage = async (payload: any) => {
     try {
         if (!payload.idFrom) return;
         if (!payload.idTo) return;
+        console.log('CREATE MESSAGE PAYLOAD ::::::::::::::::: ', payload);
         const newMessage = new Message(payload);
         const message = await newMessage.save();
+        console.log('CREATE MESSAGE MESSAGE SAVED ::::::::::::::::: ', message)
         return message;
     } catch (error) {
         console.log(error);
