@@ -2,6 +2,7 @@ import app from "./app";
 import config from "./config/config";
 import "./database";
 import jwt, { decode } from 'jsonwebtoken';
+import Controller from "./controllers/message.controller";
 
 // Socket Server
 const server = require('http').createServer(app);
@@ -19,9 +20,10 @@ io.on('connection', (client: any) => {
 
     client.join(payload.id);
 
-    client.on('personal-message', (payload: any) => {
+    client.on('personal-message', async (payload: any) => {
         console.log(payload);
-        io.to(payload.to).emit('personal-message', payload)
+        const message = await Controller.createMessage(payload);
+        io.to(payload.to).emit('personal-message', message);
     })
 
     client.on('disconnect', () => {

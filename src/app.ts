@@ -10,6 +10,7 @@ import visitRoutes from "./routes/visit.routes";
 import contactRoutes from "./routes/contact.routes";
 import preferencesRoutes from "./routes/preference.routes";
 import notificationRoutes from "./routes/notification.routes";
+import messageRoutes from "./routes/message.routes";
 
 import passport from "passport";
 import passportMiddleware from "./middlewares/passport";
@@ -45,5 +46,6 @@ app.use('/api/visits', visitRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/preferences', preferencesRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/messages', messageRoutes);
 
 export default app;

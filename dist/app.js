@@ -14,6 +14,7 @@ const visit_routes_1 = __importDefault(require("./routes/visit.routes"));
 const contact_routes_1 = __importDefault(require("./routes/contact.routes"));
 const preference_routes_1 = __importDefault(require("./routes/preference.routes"));
 const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
+const message_routes_1 = __importDefault(require("./routes/message.routes"));
 const passport_1 = __importDefault(require("passport"));
 const passport_2 = __importDefault(require("./middlewares/passport"));
 // initializations
@@ -41,4 +42,5 @@ app.use('/api/visits', visit_routes_1.default);
 app.use('/api/contacts', contact_routes_1.default);
 app.use('/api/preferences', preference_routes_1.default);
 app.use('/api/notifications', notification_routes_1.default);
+app.use('/api/messages', message_routes_1.default);
 exports.default = app;
