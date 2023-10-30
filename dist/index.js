@@ -24,6 +24,7 @@ io.on('connection', (client) => {
     client.join(payload.id);
     client.on('personal-message', (payload) => {
         console.log(payload);
+        io.to(payload.to).emit('personal-message', payload);
     });
     client.on('disconnect', () => {
         console.log('Cliente desconectado');
