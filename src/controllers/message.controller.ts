@@ -21,9 +21,9 @@ export const getChatHistorial = async (req: Request, res: Response): Promise<Res
 
 export const createMessage = async (payload: any) => {
     try {
+        console.log('CREATE MESSAGE PAYLOAD ::::::::::::::::: ', payload);
         if (!payload.idFrom) return;
         if (!payload.idTo) return;
-        console.log('CREATE MESSAGE PAYLOAD ::::::::::::::::: ', payload);
         const newMessage = new Message(payload);
         const message = await newMessage.save();
         console.log('CREATE MESSAGE MESSAGE SAVED ::::::::::::::::: ', message)

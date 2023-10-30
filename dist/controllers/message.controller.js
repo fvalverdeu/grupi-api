@@ -37,6 +37,7 @@ const getChatHistorial = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.getChatHistorial = getChatHistorial;
 const createMessage = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('CREATE MESSAGE PAYLOAD ::::::::::::::::: ', payload);
         if (!payload.idFrom)
             return;
         if (!payload.idTo)
