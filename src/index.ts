@@ -13,8 +13,15 @@ io.on('connection', (client: any) => {
     console.log(client.handshake.headers['auth-token']);
     const token = client.handshake.headers['auth-token'];
     if (!token) { return client.disconnect(); }
-    const id = jwt.verify(token, config.jwtSecret);
-    console.log('SOCKE ID USER', id);
+    const data = jwt.verify(token, config.jwtSecret);
+    const payload = JSON.parse(JSON.stringify(data));
+    console.log('SOCKET USER', payload);
+
+    client.join(payload.id);
+
+    client.on('personal-message', (payload: any) => {
+        console.log(payload);
+    })
 
     client.on('disconnect', () => {
         console.log('Cliente desconectado');

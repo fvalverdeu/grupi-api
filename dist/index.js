@@ -18,8 +18,13 @@ io.on('connection', (client) => {
     if (!token) {
         return client.disconnect();
     }
-    const id = jsonwebtoken_1.default.verify(token, config_1.default.jwtSecret);
-    console.log('SOCKE ID USER', id);
+    const data = jsonwebtoken_1.default.verify(token, config_1.default.jwtSecret);
+    const payload = JSON.parse(JSON.stringify(data));
+    console.log('SOCKET USER', payload);
+    client.join(payload.id);
+    client.on('personal-message', (payload) => {
+        console.log(payload);
+    });
     client.on('disconnect', () => {
         console.log('Cliente desconectado');
     });
