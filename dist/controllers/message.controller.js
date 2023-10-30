@@ -42,7 +42,6 @@ const createMessage = (payload) => __awaiter(void 0, void 0, void 0, function* (
             return;
         if (!payload.idTo)
             return;
-        console.log('CREATE MESSAGE PAYLOAD ::::::::::::::::: ', payload);
         const newMessage = new message_model_1.default(payload);
         const message = yield newMessage.save();
         console.log('CREATE MESSAGE MESSAGE SAVED ::::::::::::::::: ', message);
