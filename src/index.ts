@@ -21,9 +21,15 @@ io.on('connection', (client: any) => {
     client.join(dataToken.id);
 
     client.on('personal-message', async (payload: any) => {
-        console.log(payload);
-        const message = await Controller.createMessage(payload);
-        io.to(payload.idTo).emit('personal-message', message);
+        try {
+            console.log('personal-message', payload);
+            const message = await Controller.createMessage(payload);
+            console.log('message', message)
+            console.log('payload.idTo', payload.idTo);
+            io.to(payload.idTo).emit('personal-message', message);
+        } catch (error) {
+            console.log(error);
+        }
     })
 
     client.on('disconnect', () => {
