@@ -29,13 +29,20 @@ io.on('connection', (client) => {
         return client.disconnect();
     }
     const data = jsonwebtoken_1.default.verify(token, config_1.default.jwtSecret);
-    const payload = JSON.parse(JSON.stringify(data));
-    console.log('SOCKET USER', payload);
-    client.join(payload.id);
+    const dataToken = JSON.parse(JSON.stringify(data));
+    console.log('SOCKET USER', dataToken);
+    client.join(dataToken.id);
     client.on('personal-message', (payload) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(payload);
-        const message = yield message_controller_1.default.createMessage(payload);
-        io.to(payload.to).emit('personal-message', message);
+        try {
+            console.log('personal-message', payload);
+            const message = yield message_controller_1.default.createMessage(payload);
+            console.log('message', message);
+            console.log('payload.idTo', payload.idTo);
+            io.to(payload.idTo).emit('personal-message', message);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }));
     client.on('disconnect', () => {
         console.log('Cliente desconectado');
