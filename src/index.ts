@@ -15,15 +15,15 @@ io.on('connection', (client: any) => {
     const token = client.handshake.headers['auth-token'];
     if (!token) { return client.disconnect(); }
     const data = jwt.verify(token, config.jwtSecret);
-    const payload = JSON.parse(JSON.stringify(data));
-    console.log('SOCKET USER', payload);
+    const dataToken = JSON.parse(JSON.stringify(data));
+    console.log('SOCKET USER', dataToken);
 
-    client.join(payload.id);
+    client.join(dataToken.id);
 
     client.on('personal-message', async (payload: any) => {
         console.log(payload);
         const message = await Controller.createMessage(payload);
-        io.to(payload.to).emit('personal-message', message);
+        io.to(payload.idTo).emit('personal-message', message);
     })
 
     client.on('disconnect', () => {
