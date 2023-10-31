@@ -11,7 +11,7 @@ export const getChatHistorial = async (req: Request, res: Response): Promise<Res
         const messages = await Message.find({
             $or: [{ idFrom: idFrom, idTo: idTo }, { idFrom: idTo, idTo: idFrom }]
         })
-        // .sort({ createdAt: 'desc' });
+            .sort({ createdAt: 'desc' });
         return res.status(200).json(messages);
     } catch (error) {
         console.log(error);

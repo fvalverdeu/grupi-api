@@ -25,8 +25,8 @@ const getChatHistorial = (req, res) => __awaiter(void 0, void 0, void 0, functio
         // const messages = await Message.find({ idGrupi: idGrupi }).populate('idGrupi') as any[];
         const messages = yield message_model_1.default.find({
             $or: [{ idFrom: idFrom, idTo: idTo }, { idFrom: idTo, idTo: idFrom }]
-        });
-        // .sort({ createdAt: 'desc' });
+        })
+            .sort({ createdAt: 'desc' });
         return res.status(200).json(messages);
     }
     catch (error) {
