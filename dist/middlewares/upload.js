@@ -7,6 +7,7 @@ const fs_1 = __importDefault(require("fs"));
 const multer = require('multer');
 // const path = require('path');
 // const fs = require('fs');
+console.log('ENTRÓ A MULTER');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         console.log('multer', req);

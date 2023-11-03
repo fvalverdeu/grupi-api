@@ -2,7 +2,7 @@ import fs from 'fs';
 const multer = require('multer');
 // const path = require('path');
 // const fs = require('fs');
-
+console.log('ENTRÓ A MULTER')
 const storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
     console.log('multer', req);
