@@ -14,7 +14,10 @@ const storage = multer.diskStorage({
         // const pathImage = path.join(__dirname, `./src/assets/users/${req.params.id}`);
         const path = `./dist/assets/users/${req.params.id}`;
         // fs.mkdirSync(path, { recursive: true })
-        fs_1.default.mkdir(path, err => cb(null, path));
+        fs_1.default.mkdir(path, err => {
+            console.log(err);
+            cb(null, path);
+        });
     },
     filename: function (req, file, cb) {
         // cb(null, new Date().getTime() + '-' + file.originalname);
@@ -34,8 +37,8 @@ const imageFileFilter = (req, file, cb) => {
 const maxFileSize = 1024 * 1024 * 5; // 5MB
 exports.image = multer({
     storage: storage,
-    limits: {
-        fileSize: maxFileSize
-    },
-    fileFilter: imageFileFilter
+    // limits: {
+    //   fileSize: maxFileSize
+    // },
+    // fileFilter: imageFileFilter
 });
