@@ -109,7 +109,8 @@ const updateImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
     try {
         console.log('FILE ' + req);
-        user.profile.imageUrl = `https://back.grupi.app/assets/users/${_id}/image.png`;
+        // user.profile.imageUrl = `https://back.grupi.app/assets/users/${_id}/image.png`
+        user.profile.imageUrl = `https://grupi-api-production.up.railway.app//assets/users/${_id}/image.png`;
         yield user_model_1.default.findOneAndUpdate({ _id: user.id }, { profile: user.profile }, { new: true });
         return res.status(200).json({ confirm: true });
     }
